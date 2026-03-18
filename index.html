@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CENSECO 2026 - OPS V10.5 (MASTER)</title>
+    <title>CENSECO 2026 - OPS V10.6 (BUNKER)</title>
 
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22black%22/><text y=%22.85em%22 x=%2212%22 font-size=%2275%22>📡</text></svg>">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22black%22/><text y=%22.85em%22 x=%2212%22 font-size=%2275%22>📡</text></svg>">
     
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
@@ -15,50 +14,56 @@
     
     <style>
         :root { --bg: #f1f5f9; --fids: #ffcc00; --accent: #4338ca; --success: #15803d; --danger: #dc2626; --sas: #f97316; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
-        header { background: #000; color: #fff; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--fids); }
+        /* STRUCTURE FORCÉE */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important; background: var(--bg); margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        header { background: #000; color: #fff; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--fids); flex-shrink: 0; }
+        
         .nav-main { display: flex; background: #fff; border-bottom: 1px solid #cbd5e1; flex-shrink: 0; }
-        .nav-btn { padding: 15px 25px; cursor: pointer; border: none; background: none; font-weight: bold; opacity: 0.5; }
-        .nav-btn.active { opacity: 1; border-bottom: 3px solid var(--accent); color: var(--accent); }
+        .nav-btn { padding: 15px 25px; cursor: pointer; border: none; background: none; font-weight: 900; opacity: 0.4; text-transform: uppercase; font-size: 0.85em; }
+        .nav-btn.active { opacity: 1; border-bottom: 4px solid var(--accent); color: var(--accent); }
         
-        .container { flex: 1; overflow-y: auto; padding: 20px; position: relative; }
-        .page { display: none; } .page.active { display: block; }
+        .container { flex: 1; overflow-y: auto !important; padding: 20px; position: relative; display: block !important; }
+        .page { display: none; width: 100%; } 
+        .page.active { display: block !important; }
         
-        /* FORMULAIRE */
-        .card { background: #e2e8f0; padding: 18px; border-radius: 12px; border: 1px solid #cbd5e1; margin-bottom: 20px; }
-        .row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 10px; }
-        .field { display: flex; flex-direction: column; gap: 5px; }
-        .field label { font-size: 0.65em; font-weight: 900; color: #475569; text-transform: uppercase; }
-        input, select { padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: 800; }
-        
-        /* TABLEAUX MASTER */
-        .t-table { width: 100%; border-collapse: separate; border-spacing: 0 5px; margin-bottom: 10px; table-layout: fixed; }
-        .t-table th { text-align: left; padding: 10px; font-size: 0.65em; text-transform: uppercase; color: #64748b; font-weight: 900; }
-        .t-row td { background: #fff; padding: 12px; border-top: 1px solid #cbd5e1; border-bottom: 1px solid #cbd5e1; vertical-align: middle; cursor: pointer; }
-        
-        .date-sep { background: #1e293b; color: var(--fids); padding: 10px 15px; font-weight: 900; font-size: 0.85em; border-radius: 8px; margin: 20px 0 8px 0; display: flex; justify-content: space-between; }
-        
-        /* DESIGN PRIORITES */
-        .col-prio { width: 45px; text-align: center; font-weight: 900; border-left: 10px solid transparent; }
+        /* TABLEAUX TACTIQUES (FORÇAGE) */
+        .t-table { width: 100% !important; border-collapse: separate !important; border-spacing: 0 6px !important; display: table !important; margin-bottom: 15px; table-layout: fixed; }
+        .t-table thead { display: table-header-group !important; }
+        .t-table tbody { display: table-row-group !important; }
+        .t-table tr { display: table-row !important; }
+        .t-table th { display: table-cell !important; padding: 10px; font-size: 0.7em; text-transform: uppercase; color: #64748b; font-weight: 900; text-align: left; }
+        .t-table td { display: table-cell !important; background: #fff; padding: 12px; border-top: 1px solid #cbd5e1; border-bottom: 1px solid #cbd5e1; vertical-align: middle; }
+
+        /* PRIORITÉS */
+        .col-prio { width: 50px !important; text-align: center; font-weight: 900; border-left: 10px solid transparent !important; border-radius: 6px 0 0 6px; }
         .prio-0 { border-left-color: #000 !important; }
         .prio-1 { border-left-color: var(--danger) !important; }
-        .row-p0 td { background-color: #ffff00 !important; color: #000 !important; font-weight: 900; }
+        .prio-2 { border-left-color: var(--accent) !important; }
         
-        /* TIMELINE */
-        .vis-container { background: #0f172a !important; border-radius: 12px; height: 400px; }
-        .tl-p0 { background: #ffff00 !important; color: #000 !important; }
-        
-        .drawer { display: none; padding: 15px; background: #f8fafc; border-left: 10px solid var(--accent); border-radius: 0 0 8px 8px; font-size: 0.9em; }
-        .btn-v { background: var(--success); color: #fff; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 900; cursor: pointer; }
-        .btn-i { padding: 8px 10px; border-radius: 6px; border: none; color: #fff; font-weight: 900; cursor: pointer; margin-left: 5px; font-size: 0.7em; }
+        .row-p0 td { background-color: #ffff00 !important; color: #000 !important; border-top: 2px solid #000 !important; border-bottom: 2px solid #000 !important; }
+
+        /* SÉPARATEURS */
+        .date-sep { background: #1e293b !important; color: var(--fids) !important; padding: 12px 15px !important; font-weight: 900; font-size: 0.9em; border-radius: 8px; margin: 25px 0 10px 0; display: flex !important; justify-content: space-between; align-items: center; }
+
+        /* FORMULAIRE */
+        .card { background: #e2e8f0; padding: 20px; border-radius: 12px; border: 1px solid #cbd5e1; margin-bottom: 25px; }
+        .row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+        .field { display: flex; flex-direction: column; gap: 5px; }
+        .field label { font-size: 0.65em; font-weight: 900; color: #475569; text-transform: uppercase; }
+        input, select { padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: 800; background: #fff; }
+
+        .vis-container { background: #0f172a !important; border-radius: 12px; border: 2px solid #334155; height: 500px !important; }
+        .btn-v { background: var(--success); color: #fff; border: none; padding: 12px 25px; border-radius: 8px; font-weight: 900; cursor: pointer; }
+        .btn-i { padding: 8px 12px; border-radius: 6px; border: none; color: #fff; font-weight: 900; cursor: pointer; margin-left: 5px; font-size: 0.75em; }
+        .drawer { display: none; padding: 15px; background: #f8fafc; border-left: 12px solid var(--accent); border-radius: 0 0 8px 8px; border-bottom: 1px solid #cbd5e1; }
     </style>
 </head>
 <body>
 
 <header>
-    <div style="font-weight: 900;">CENSECO 2026 - OPS <span style="color:var(--fids)">V10.5 MASTER</span></div>
-    <div id="clock">00:00:00</div>
+    <div style="font-weight: 900; font-size: 1.2em;">CENSECO 2026 - <span style="color:var(--fids)">OPS V10.6</span></div>
+    <div id="clock" style="font-family: monospace; color: var(--fids); font-size: 1.3em;">00:00:00</div>
 </header>
 
 <div class="nav-main">
@@ -72,21 +77,21 @@
         <div class="card">
             <input type="hidden" id="editTaskId">
             <div class="row">
-                <div id="nextPdgId" style="background:#000;color:var(--fids);padding:10px;border-radius:6px;font-weight:900;border:1px solid var(--fids);">PDG-XXXXX</div>
-                <div class="field" style="flex:1;"><label>Titre Mission</label><input type="text" id="tTitle"></div>
+                <div id="nextPdgId" style="background:#000;color:var(--fids);padding:12px;border-radius:8px;font-weight:900;border:2px solid var(--fids); font-size:1.1em;">PDG-XXXXX</div>
+                <div class="field" style="flex:1;"><label>Mission</label><input type="text" id="tTitle" placeholder="Titre de l'intervention"></div>
                 <div class="field"><label>Responsable</label><select id="tResp"></select></div>
-                <div id="sectorGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;background:#fff;padding:10px;border-radius:8px;"></div>
+                <div id="sectorGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;background:#fff;padding:10px;border-radius:10px;border:1px solid #cbd5e1;"></div>
             </div>
-            <div class="row">
-                <div class="field"><label>Lieu</label><input type="text" id="tLoc"></div>
+            <div class="row" style="margin-top:15px;">
                 <div class="field"><label>Début</label><input type="datetime-local" id="tStart"></div>
                 <div class="field"><label>Fin</label><input type="datetime-local" id="tEnd"></div>
                 <div class="field"><label>Prio</label>
                     <select id="tPrio"><option value="0">🚨 P0</option><option value="1">P1</option><option value="2" selected>P2</option></select>
                 </div>
-                <div class="field"><label>TL</label><input type="checkbox" id="tTL" checked></div>
+                <div class="field"><label>Timeline</label><input type="checkbox" id="tTL" checked style="width:20px;height:20px;"></div>
+                <input type="text" id="tLoc" placeholder="Lieu précis" style="width:150px">
                 <input type="text" id="tNote" placeholder="Notes..." style="flex:1">
-                <button class="btn-v" onclick="addMission()">VALIDER</button>
+                <button class="btn-v" onclick="addMission()">VALIDER MISSION</button>
             </div>
         </div>
         <div id="p0Container"></div>
@@ -99,8 +104,7 @@
 
     <div id="retex" class="page">
         <div id="sasList"></div>
-        <hr>
-        <div id="archiveList"></div>
+        <div id="archiveList" style="margin-top:30px;"></div>
     </div>
 </div>
 
@@ -142,7 +146,7 @@
     function addMission() {
         const id = document.getElementById('editTaskId').value;
         const sects = Array.from(document.querySelectorAll('input[name="sect"]:checked')).map(cb => cb.value);
-        if(!document.getElementById('tTitle').value || !sects.length) return alert("Données manquantes");
+        if(!document.getElementById('tTitle').value || !sects.length) return alert("Champs obligatoires manquants");
         
         const m = {
             id: id ? parseInt(id) : Date.now(),
@@ -164,7 +168,7 @@
         opCont.innerHTML = ''; p0Cont.innerHTML = ''; itemsOps.clear();
         const active = db_missions.filter(m => m.status === 'active');
 
-        // P0
+        // P0 SECTION
         const p0s = active.filter(m => m.priority == 0);
         if(p0s.length) {
             let h = `<table class="t-table"><thead><tr><th style="width:50px">P</th><th style="width:130px">Heure</th><th>Mission</th><th style="width:150px">Actions</th></tr></thead><tbody>`;
@@ -172,7 +176,6 @@
             p0Cont.innerHTML = h + `</tbody></table>`;
         }
 
-        // Groupement par date
         const grouped = {};
         active.filter(m => m.priority != 0).forEach(m => {
             let d = new Date(m.start).toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long'});
@@ -197,29 +200,37 @@
         const s = new Date(m.start), e = new Date(m.end);
         return `<tr class="t-row ${m.priority==0?'row-p0':''}" onclick="toggleDrawer('${m.id}','${cleanD}')">
             <td class="col-prio prio-${m.priority}">P${m.priority}</td>
-            <td style="font-size:0.8em;font-weight:bold;">${s.getHours()}:${s.getMinutes().toString().padStart(2,'0')} - ${e.getHours()}:${e.getMinutes().toString().padStart(2,'0')}</td>
-            <td><b>${m.pdgId}</b> - ${m.title}<br><small>${m.sector.join(', ')}</small></td>
+            <td style="font-weight:bold; font-size:0.85em;">${s.getHours()}:${s.getMinutes().toString().padStart(2,'0')} - ${e.getHours()}:${e.getMinutes().toString().padStart(2,'0')}</td>
+            <td><b>${m.pdgId}</b> - ${m.title}<br><small style="color:#64748b">${m.sector.join(', ')}</small></td>
             <td style="text-align:right;">
-                <button class="btn-i" style="background:var(--accent)" onclick="event.stopPropagation(); editMission(${m.id})">M</button>
-                <button class="btn-i" style="background:var(--sas)" onclick="event.stopPropagation(); setStatus(${m.id},'sas')">F</button>
+                <button class="btn-i" style="background:var(--accent)" onclick="event.stopPropagation(); editMission(${m.id})">EDIT</button>
+                <button class="btn-i" style="background:var(--sas)" onclick="event.stopPropagation(); setStatus(${m.id},'sas')">FIN</button>
             </td>
         </tr>
-        <tr><td colspan="4" style="padding:0;border:none;"><div id="dr-${m.id}-${cleanD}" class="drawer"><b>Lieu:</b> ${m.loc} | <b>Resp:</b> ${m.resp}<br><b>Notes:</b> ${m.note}</div></td></tr>`;
+        <tr><td colspan="4" style="padding:0; border:none;"><div id="dr-${m.id}-${cleanD}" class="drawer"><b>📍 Lieu :</b> ${m.loc} | <b>👤 Resp :</b> ${m.resp}<br><b>📝 Notes :</b> ${m.note}</div></td></tr>`;
     }
 
     function initTimeline() {
         timelineOps = new vis.Timeline(document.getElementById('vis-ops'), itemsOps, groupsOps, { stack: false, showCurrentTime: true });
-        timelineOps.on('click', p => { if(p.items.length) { const m = db_missions.find(x=>x.id==p.items[0].split('_')[0]); alert(`PDG: ${m.pdgId}\n${m.title}\nLieu: ${m.loc}`); }});
     }
 
     function saveData() { dbRef.set({ data: db_missions, counter: counter_pdg }); }
     function setStatus(id, s) { db_missions[db_missions.findIndex(x=>x.id==id)].status = s; saveData(); }
-    function editMission(id) { const m = db_missions.find(x=>x.id==id); document.getElementById('editTaskId').value = m.id; document.getElementById('tTitle').value = m.title; window.scrollTo(0,0); }
+    function editMission(id) { 
+        const m = db_missions.find(x=>x.id==id); 
+        document.getElementById('editTaskId').value = m.id; 
+        document.getElementById('tTitle').value = m.title; 
+        document.getElementById('tLoc').value = m.loc;
+        document.getElementById('tNote').value = m.note;
+        document.getElementById('tPrio').value = m.priority;
+        document.querySelectorAll('input[name="sect"]').forEach(cb => cb.checked = m.sector.includes(cb.value));
+        window.scrollTo(0,0); 
+    }
     function toggleDrawer(id, d) { const el = document.getElementById(`dr-${id}-${d}`); el.style.display = el.style.display === 'block' ? 'none' : 'block'; }
     function toggleCollapse(d) { if(collapsed.includes(d)) collapsed = collapsed.filter(x=>x!==d); else collapsed.push(d); renderAll(); }
     function setInputsTime() { const n = new Date(); n.setMinutes(n.getMinutes() - n.getTimezoneOffset()); document.getElementById('tStart').value = n.toISOString().slice(0, 16); document.getElementById('nextPdgId').innerText = "PDG-"+counter_pdg.toString().padStart(5,'0'); }
     function resetForm() { document.getElementById('editTaskId').value = ''; document.querySelectorAll('input[name="sect"]').forEach(cb=>cb.checked=false); setInputsTime(); }
-    function showPage(id, e) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); if(id === 'timeline-ops') setTimeout(() => timelineOps.redraw(), 100); }
+    function showPage(id, e) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active')); e.target.classList.add('active'); if(id === 'timeline-ops') setTimeout(() => timelineOps.redraw(), 100); }
 </script>
 </body>
 </html>
