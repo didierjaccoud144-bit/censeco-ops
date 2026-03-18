@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CENSECO 2026 - OPS V10.6 (BUNKER)</title>
+    <title>CENSECO 2026 - OPS V10.7 (RESTORED)</title>
 
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22black%22/><text y=%22.85em%22 x=%2212%22 font-size=%2275%22>📡</text></svg>">
     
@@ -14,55 +14,43 @@
     
     <style>
         :root { --bg: #f1f5f9; --fids: #ffcc00; --accent: #4338ca; --success: #15803d; --danger: #dc2626; --sas: #f97316; }
-        
-        /* STRUCTURE FORCÉE */
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important; background: var(--bg); margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         header { background: #000; color: #fff; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--fids); flex-shrink: 0; }
-        
         .nav-main { display: flex; background: #fff; border-bottom: 1px solid #cbd5e1; flex-shrink: 0; }
         .nav-btn { padding: 15px 25px; cursor: pointer; border: none; background: none; font-weight: 900; opacity: 0.4; text-transform: uppercase; font-size: 0.85em; }
         .nav-btn.active { opacity: 1; border-bottom: 4px solid var(--accent); color: var(--accent); }
-        
-        .container { flex: 1; overflow-y: auto !important; padding: 20px; position: relative; display: block !important; }
-        .page { display: none; width: 100%; } 
-        .page.active { display: block !important; }
-        
-        /* TABLEAUX TACTIQUES (FORÇAGE) */
-        .t-table { width: 100% !important; border-collapse: separate !important; border-spacing: 0 6px !important; display: table !important; margin-bottom: 15px; table-layout: fixed; }
-        .t-table thead { display: table-header-group !important; }
-        .t-table tbody { display: table-row-group !important; }
-        .t-table tr { display: table-row !important; }
-        .t-table th { display: table-cell !important; padding: 10px; font-size: 0.7em; text-transform: uppercase; color: #64748b; font-weight: 900; text-align: left; }
-        .t-table td { display: table-cell !important; background: #fff; padding: 12px; border-top: 1px solid #cbd5e1; border-bottom: 1px solid #cbd5e1; vertical-align: middle; }
+        .container { flex: 1; overflow-y: auto; padding: 20px; }
+        .page { display: none; } .page.active { display: block; }
 
-        /* PRIORITÉS */
-        .col-prio { width: 50px !important; text-align: center; font-weight: 900; border-left: 10px solid transparent !important; border-radius: 6px 0 0 6px; }
+        /* DESIGN TABLEAU MASTER */
+        .t-table { width: 100%; border-collapse: separate; border-spacing: 0 6px; margin-bottom: 20px; table-layout: fixed; }
+        .t-table th { text-align: left; padding: 10px; font-size: 0.7em; color: #64748b; font-weight: 900; text-transform: uppercase; }
+        .t-row td { background: #fff; padding: 12px; border-top: 1px solid #cbd5e1; border-bottom: 1px solid #cbd5e1; cursor: pointer; }
+        
+        .col-prio { width: 50px; text-align: center; font-weight: 900; border-left: 10px solid transparent; border-radius: 6px 0 0 6px; }
         .prio-0 { border-left-color: #000 !important; }
         .prio-1 { border-left-color: var(--danger) !important; }
         .prio-2 { border-left-color: var(--accent) !important; }
         
-        .row-p0 td { background-color: #ffff00 !important; color: #000 !important; border-top: 2px solid #000 !important; border-bottom: 2px solid #000 !important; }
-
-        /* SÉPARATEURS */
-        .date-sep { background: #1e293b !important; color: var(--fids) !important; padding: 12px 15px !important; font-weight: 900; font-size: 0.9em; border-radius: 8px; margin: 25px 0 10px 0; display: flex !important; justify-content: space-between; align-items: center; }
-
-        /* FORMULAIRE */
+        .row-p0 td { background-color: #ffff00 !important; color: #000 !important; border-top: 2px solid #000 !important; border-bottom: 2px solid #000 !important; font-weight: 900; }
+        .date-sep { background: #1e293b; color: var(--fids); padding: 12px 15px; font-weight: 900; font-size: 0.9em; border-radius: 8px; margin: 25px 0 10px 0; display: flex; justify-content: space-between; cursor: pointer; }
+        
         .card { background: #e2e8f0; padding: 20px; border-radius: 12px; border: 1px solid #cbd5e1; margin-bottom: 25px; }
         .row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
         .field { display: flex; flex-direction: column; gap: 5px; }
         .field label { font-size: 0.65em; font-weight: 900; color: #475569; text-transform: uppercase; }
-        input, select { padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: 800; background: #fff; }
+        input, select { padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: 800; }
 
-        .vis-container { background: #0f172a !important; border-radius: 12px; border: 2px solid #334155; height: 500px !important; }
+        .vis-container { background: #0f172a !important; border-radius: 12px; border: 2px solid #334155; height: 550px; }
         .btn-v { background: var(--success); color: #fff; border: none; padding: 12px 25px; border-radius: 8px; font-weight: 900; cursor: pointer; }
-        .btn-i { padding: 8px 12px; border-radius: 6px; border: none; color: #fff; font-weight: 900; cursor: pointer; margin-left: 5px; font-size: 0.75em; }
+        .btn-i { padding: 8px 12px; border-radius: 6px; border: none; color: #fff; font-weight: 900; cursor: pointer; margin-left: 5px; }
         .drawer { display: none; padding: 15px; background: #f8fafc; border-left: 12px solid var(--accent); border-radius: 0 0 8px 8px; border-bottom: 1px solid #cbd5e1; }
     </style>
 </head>
 <body>
 
 <header>
-    <div style="font-weight: 900; font-size: 1.2em;">CENSECO 2026 - <span style="color:var(--fids)">OPS V10.6</span></div>
+    <div style="font-weight: 900; font-size: 1.2em;">CENSECO 2026 - <span style="color:var(--fids)">OPS V10.7 MASTER</span></div>
     <div id="clock" style="font-family: monospace; color: var(--fids); font-size: 1.3em;">00:00:00</div>
 </header>
 
@@ -78,7 +66,7 @@
             <input type="hidden" id="editTaskId">
             <div class="row">
                 <div id="nextPdgId" style="background:#000;color:var(--fids);padding:12px;border-radius:8px;font-weight:900;border:2px solid var(--fids); font-size:1.1em;">PDG-XXXXX</div>
-                <div class="field" style="flex:1;"><label>Mission</label><input type="text" id="tTitle" placeholder="Titre de l'intervention"></div>
+                <div class="field" style="flex:1;"><label>Mission</label><input type="text" id="tTitle" placeholder="Titre intervention"></div>
                 <div class="field"><label>Responsable</label><select id="tResp"></select></div>
                 <div id="sectorGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;background:#fff;padding:10px;border-radius:10px;border:1px solid #cbd5e1;"></div>
             </div>
@@ -90,7 +78,7 @@
                 </div>
                 <div class="field"><label>Timeline</label><input type="checkbox" id="tTL" checked style="width:20px;height:20px;"></div>
                 <input type="text" id="tLoc" placeholder="Lieu précis" style="width:150px">
-                <input type="text" id="tNote" placeholder="Notes..." style="flex:1">
+                <input type="text" id="tNote" placeholder="Notes tactiques..." style="flex:1">
                 <button class="btn-v" onclick="addMission()">VALIDER MISSION</button>
             </div>
         </div>
@@ -104,7 +92,7 @@
 
     <div id="retex" class="page">
         <div id="sasList"></div>
-        <div id="archiveList" style="margin-top:30px;"></div>
+        <div id="archiveList" style="margin-top:20px;"></div>
     </div>
 </div>
 
@@ -135,10 +123,17 @@
         RESPS.forEach(r => document.getElementById('tResp').add(new Option(r, r)));
         SECTEURS.forEach(s => { document.getElementById('sectorGrid').innerHTML += `<label style="font-size:0.7em;font-weight:bold;"><input type="checkbox" name="sect" value="${s}"> ${s}</label>`; });
         initTimeline();
+        
         dbRef.on('value', snap => {
             const data = snap.val();
-            if(data) { db_missions = data.data || []; counter_pdg = data.counter || 1; renderAll(); }
+            if(data) {
+                db_missions = data.data || [];
+                counter_pdg = data.counter || 1;
+                renderAll();
+                renderRetex();
+            }
         });
+
         setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('fr-FR'); }, 1000);
         setInputsTime();
     };
@@ -146,7 +141,7 @@
     function addMission() {
         const id = document.getElementById('editTaskId').value;
         const sects = Array.from(document.querySelectorAll('input[name="sect"]:checked')).map(cb => cb.value);
-        if(!document.getElementById('tTitle').value || !sects.length) return alert("Champs obligatoires manquants");
+        if(!document.getElementById('tTitle').value || !sects.length) return alert("Champs vides");
         
         const m = {
             id: id ? parseInt(id) : Date.now(),
@@ -160,12 +155,14 @@
 
         if(id) db_missions[db_missions.findIndex(x=>x.id==id)] = m;
         else { db_missions.push(m); counter_pdg++; }
-        saveData(); resetForm();
+        saveToFirebase(); resetForm();
     }
 
     function renderAll() {
         const opCont = document.getElementById('opsList'); const p0Cont = document.getElementById('p0Container');
+        if(!opCont) return;
         opCont.innerHTML = ''; p0Cont.innerHTML = ''; itemsOps.clear();
+
         const active = db_missions.filter(m => m.status === 'active');
 
         // P0 SECTION
@@ -201,31 +198,34 @@
         return `<tr class="t-row ${m.priority==0?'row-p0':''}" onclick="toggleDrawer('${m.id}','${cleanD}')">
             <td class="col-prio prio-${m.priority}">P${m.priority}</td>
             <td style="font-weight:bold; font-size:0.85em;">${s.getHours()}:${s.getMinutes().toString().padStart(2,'0')} - ${e.getHours()}:${e.getMinutes().toString().padStart(2,'0')}</td>
-            <td><b>${m.pdgId}</b> - ${m.title}<br><small style="color:#64748b">${m.sector.join(', ')}</small></td>
+            <td><b>${m.pdgId}</b> - ${m.title}<br><small style="color:#64748b; font-weight:bold;">${m.sector.join(', ')}</small></td>
             <td style="text-align:right;">
-                <button class="btn-i" style="background:var(--accent)" onclick="event.stopPropagation(); editMission(${m.id})">EDIT</button>
+                <button class="btn-i" style="background:var(--accent)" onclick="event.stopPropagation(); editMission(${m.id})">MODIFIER</button>
                 <button class="btn-i" style="background:var(--sas)" onclick="event.stopPropagation(); setStatus(${m.id},'sas')">FIN</button>
             </td>
         </tr>
-        <tr><td colspan="4" style="padding:0; border:none;"><div id="dr-${m.id}-${cleanD}" class="drawer"><b>📍 Lieu :</b> ${m.loc} | <b>👤 Resp :</b> ${m.resp}<br><b>📝 Notes :</b> ${m.note}</div></td></tr>`;
+        <tr><td colspan="4" style="padding:0; border:none;"><div id="dr-${m.id}-${cleanD}" class="drawer"><b>📍 LIEU :</b> ${m.loc} | <b>👤 RESP :</b> ${m.resp}<br><b>📝 NOTES :</b> ${m.note}</div></td></tr>`;
+    }
+
+    function renderRetex() {
+        const sCont = document.getElementById('sasList'); const aCont = document.getElementById('archiveList');
+        if(!sCont) return;
+        sCont.innerHTML = ''; aCont.innerHTML = '';
+        db_missions.filter(m => m.status === 'sas').forEach(m => {
+            sCont.innerHTML += `<div class="card" style="display:flex; justify-content:space-between; align-items:center;"><span><b>${m.pdgId}</b> - ${m.title}</span><button class="btn-v" onclick="setStatus(${m.id},'archived')">ARCHIVER</button></div>`;
+        });
+        db_missions.filter(m => m.status === 'archived').forEach(m => {
+            aCont.innerHTML += `<div style="padding:8px; border-bottom:1px solid #ccc; font-size:0.8em;">📂 ${m.pdgId} - ${m.title}</div>`;
+        });
     }
 
     function initTimeline() {
         timelineOps = new vis.Timeline(document.getElementById('vis-ops'), itemsOps, groupsOps, { stack: false, showCurrentTime: true });
+        timelineOps.on('click', p => { if(p.items.length) { const m = db_missions.find(x => x.id == p.items[0].split('_')[0]); alert(`PDG: ${m.pdgId}\n${m.title}\nLieu: ${m.loc}`); }});
     }
 
-    function saveData() { dbRef.set({ data: db_missions, counter: counter_pdg }); }
-    function setStatus(id, s) { db_missions[db_missions.findIndex(x=>x.id==id)].status = s; saveData(); }
-    function editMission(id) { 
-        const m = db_missions.find(x=>x.id==id); 
-        document.getElementById('editTaskId').value = m.id; 
-        document.getElementById('tTitle').value = m.title; 
-        document.getElementById('tLoc').value = m.loc;
-        document.getElementById('tNote').value = m.note;
-        document.getElementById('tPrio').value = m.priority;
-        document.querySelectorAll('input[name="sect"]').forEach(cb => cb.checked = m.sector.includes(cb.value));
-        window.scrollTo(0,0); 
-    }
+    function saveToFirebase() { dbRef.set({ data: db_missions, counter: counter_pdg }); }
+    function setStatus(id, s) { db_missions[db_missions.findIndex(x=>x.id==id)].status = s; saveToFirebase(); }
     function toggleDrawer(id, d) { const el = document.getElementById(`dr-${id}-${d}`); el.style.display = el.style.display === 'block' ? 'none' : 'block'; }
     function toggleCollapse(d) { if(collapsed.includes(d)) collapsed = collapsed.filter(x=>x!==d); else collapsed.push(d); renderAll(); }
     function setInputsTime() { const n = new Date(); n.setMinutes(n.getMinutes() - n.getTimezoneOffset()); document.getElementById('tStart').value = n.toISOString().slice(0, 16); document.getElementById('nextPdgId').innerText = "PDG-"+counter_pdg.toString().padStart(5,'0'); }
