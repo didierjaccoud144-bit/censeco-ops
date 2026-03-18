@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CENSECO 2026 - OPS V11.5 (MASTER)</title>
+    <title>CENSECO 2026 - OPS V11.6 (RENAISSANCE)</title>
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
@@ -29,11 +29,10 @@
         .field label { font-size: 0.65em; font-weight: 900; color: #475569; text-transform: uppercase; }
         input, select { padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: 800; background: #fff; }
 
-        /* TABLEAUX MASTER REBÂTIS */
+        /* TABLEAUX MASTER */
         .t-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; margin-bottom: 15px; table-layout: fixed; }
         .t-table th { text-align: left; padding: 10px; font-size: 0.7em; text-transform: uppercase; color: #64748b; font-weight: 900; }
-        .t-row td { background: #fff; padding: 15px; border-top: 1px solid #cbd5e1; border-bottom: 1px solid #cbd5e1; vertical-align: middle; cursor: pointer; transition: 0.2s; }
-        .t-row:hover td { transform: scale(1.002); box-shadow: 0 4px 8px rgba(0,0,0,0.05); }
+        .t-row td { background: #fff; padding: 15px; border-top: 1px solid #cbd5e1; border-bottom: 1px solid #cbd5e1; vertical-align: middle; cursor: pointer; }
 
         .col-prio { width: 55px; text-align: center; font-weight: 900; border-left: 12px solid transparent; border-radius: 8px 0 0 8px; font-size: 1.1em; }
         .prio-0 { border-left-color: #000 !important; }
@@ -42,7 +41,7 @@
         
         .row-p0 td { background-color: #ffff00 !important; color: #000 !important; border-top: 2px solid #000 !important; border-bottom: 2px solid #000 !important; font-weight: 900; }
         
-        .date-sep { background: var(--dark); color: var(--fids); padding: 12px 18px; font-weight: 900; font-size: 0.9em; border-radius: 8px; margin: 30px 0 10px 0; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); cursor: pointer; }
+        .date-sep { background: var(--dark); color: var(--fids); padding: 12px 18px; font-weight: 900; font-size: 0.9em; border-radius: 8px; margin: 30px 0 10px 0; display: flex; justify-content: space-between; align-items: center; }
         
         .btn-v { background: var(--success); color: #fff; border: none; padding: 14px 25px; border-radius: 10px; font-weight: 900; cursor: pointer; box-shadow: 0 4px 0 #065f46; }
         .btn-v:active { transform: translateY(2px); box-shadow: 0 2px 0 #065f46; }
@@ -50,14 +49,15 @@
 
         .drawer { display: none; padding: 20px; background: #f8fafc; border-left: 15px solid var(--accent); border-radius: 0 0 15px 15px; border-bottom: 1px solid #cbd5e1; line-height: 1.6; }
         .sect-tag { background: #f1f5f9; padding: 3px 8px; border-radius: 6px; font-size: 0.75em; font-weight: 800; border: 1px solid #cbd5e1; color: #334155; margin-right: 5px; }
-        .footer { text-align: center; padding: 15px; font-size: 0.75em; opacity: 0.5; font-weight: bold; }
+        
+        .btn-danger-zone { margin-top: 50px; padding: 10px; background: #fee2e2; border: 1px dashed red; border-radius: 8px; text-align: center; }
     </style>
 </head>
 <body>
 
 <header>
-    <div style="font-weight: 900; font-size: 1.3em;">CENSECO 2026 - <span style="color:var(--fids)">OPS V11.5 MASTER</span></div>
-    <div id="clock" style="font-family: monospace; color: var(--fids); font-size: 1.4em; font-weight: 900;">00:00:00</div>
+    <div style="font-weight: 900; font-size: 1.3em;">CENSECO 2026 - <span style="color:var(--fids)">OPS V11.6 MASTER</span></div>
+    <div id="clock">00:00:00</div>
 </header>
 
 <div class="nav-main">
@@ -87,19 +87,23 @@
                 <button class="btn-v" onclick="addMission()">VALIDER MISSION</button>
             </div>
         </div>
+
         <div id="p0Container"></div>
         <div id="opsList"></div>
+
+        <div class="btn-danger-zone">
+            <small style="color:red; font-weight:bold;">ZONE DE MAINTENANCE :</small><br>
+            <button onclick="purgeFirebase()" style="background:red; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer; font-size:0.8em; margin-top:5px;">🗑️ PURGER TOUTES LES DONNÉES (RESET)</button>
+        </div>
     </div>
 
     <div id="retex" class="page">
-        <h3 style="color:var(--sas); border-bottom:2px solid var(--sas); padding-bottom:10px;">📥 SAS DE CLÔTURE</h3>
+        <h3 style="color:var(--sas); border-bottom:2px solid var(--sas);">📥 SAS DE CLÔTURE</h3>
         <div id="sasList"></div>
-        <h3 style="color:var(--accent); border-bottom:2px solid var(--accent); padding-bottom:10px; margin-top:40px;">🗄️ ARCHIVES MISSIONS</h3>
+        <h3 style="color:var(--accent); border-bottom:2px solid var(--accent); margin-top:40px;">🗄️ ARCHIVES</h3>
         <div id="archiveList"></div>
     </div>
 </div>
-
-<div class="footer">Une création DJA’WEB avec l’aide de Gemini IA</div>
 
 <script>
     const firebaseConfig = {
@@ -128,7 +132,7 @@
         dbRef.on('value', snap => {
             const data = snap.val();
             if(data) {
-                db_missions = data.data || [];
+                db_missions = Array.isArray(data.data) ? data.data : [];
                 counter_pdg = data.counter || 1;
                 renderAll();
                 renderRetex();
@@ -139,36 +143,38 @@
     };
 
     function addMission() {
-        const id = document.getElementById('editTaskId').value;
+        const title = document.getElementById('tTitle').value;
         const sects = Array.from(document.querySelectorAll('input[name="sect"]:checked')).map(cb => cb.value);
-        if(!document.getElementById('tTitle').value || !sects.length) return alert("⚠️ Données incomplètes.");
+        if(!title || sects.length === 0) return alert("⚠️ Données incomplètes !");
 
         const m = {
-            id: id ? parseInt(id) : Date.now(),
-            pdgId: id ? db_missions.find(x=>x.id==id).pdgId : "PDG-"+counter_pdg.toString().padStart(5,'0'),
-            title: document.getElementById('tTitle').value, resp: document.getElementById('tResp').value,
-            loc: document.getElementById('tLoc').value, start: document.getElementById('tStart').value,
+            id: Date.now(),
+            pdgId: "PDG-"+counter_pdg.toString().padStart(5,'0'),
+            title: title, resp: document.getElementById('tResp').value,
+            loc: document.getElementById('tLoc').value || "-", 
+            start: document.getElementById('tStart').value,
             end: document.getElementById('tEnd').value || document.getElementById('tStart').value,
-            priority: document.getElementById('tPrio').value, 
-            cpf: document.getElementById('tCPF').checked, note: document.getElementById('tNote').value,
+            priority: parseInt(document.getElementById('tPrio').value),
+            cpf: document.getElementById('tCPF').checked, 
+            note: document.getElementById('tNote').value || "-",
             sector: sects, status: 'active'
         };
 
-        if(id) db_missions[db_missions.findIndex(x=>x.id==id)] = m;
-        else { db_missions.push(m); counter_pdg++; }
-        saveData(); resetForm();
+        db_missions.push(m);
+        counter_pdg++;
+        dbRef.set({ data: db_missions, counter: counter_pdg });
+        resetForm();
     }
 
     function renderAll() {
         const opCont = document.getElementById('opsList'); const p0Cont = document.getElementById('p0Container');
         opCont.innerHTML = ''; p0Cont.innerHTML = ''; 
 
-        const active = db_missions.filter(m => m.status === 'active');
+        const active = db_missions.filter(m => m && m.status === 'active');
 
-        // P0
         const p0s = active.filter(m => m.priority == 0);
         if(p0s.length) {
-            let h = `<table class="t-table"><thead><tr><th style="width:55px">P</th><th style="width:130px">Heure</th><th>Mission</th><th style="width:160px">Actions</th></tr></thead><tbody>`;
+            let h = `<table class="t-table"><thead><tr><th style="width:55px">P</th><th style="width:130px">Horaires</th><th>Mission</th><th style="width:160px">Actions</th></tr></thead><tbody>`;
             p0s.forEach(m => h += renderRow(m, "P0"));
             p0Cont.innerHTML = h + `</tbody></table>`;
         }
@@ -196,7 +202,7 @@
         const s = new Date(m.start), e = new Date(m.end);
         return `<tr class="t-row ${m.priority==0?'row-p0':''}" onclick="toggleDrawer('${m.id}','${cleanD}')">
             <td class="col-prio prio-${m.priority}">P${m.priority}</td>
-            <td style="font-weight:900; font-size:0.85em; color:#1e293b;">${s.getHours()}:${s.getMinutes().toString().padStart(2,'0')}<br>${e.getHours()}:${e.getMinutes().toString().padStart(2,'0')}</td>
+            <td style="font-weight:900; font-size:0.85em;">${s.getHours()}:${s.getMinutes().toString().padStart(2,'0')}<br>${e.getHours()}:${e.getMinutes().toString().padStart(2,'0')}</td>
             <td><b>${m.title}</b><br>${m.sector.map(st=>`<span class="sect-tag">${st}</span>`).join('')}</td>
             <td style="text-align:right;">
                 <button class="btn-i" style="background:var(--accent)" onclick="event.stopPropagation(); editMission(${m.id})">EDIT</button>
@@ -204,11 +210,7 @@
             </td>
         </tr>
         <tr><td colspan="4" style="padding:0; border:none;"><div id="dr-${m.id}-${cleanD}" class="drawer">
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
-                <div><b>📍 LIEU :</b> ${m.loc || '-'}</div>
-                <div><b>👤 RESPONSABLE :</b> ${m.resp}</div>
-            </div>
-            <div style="margin-top:10px; padding-top:10px; border-top:1px dashed #ccc;"><b>📝 NOTES :</b><br>${m.note || '-'}</div>
+            <b>📍 LIEU :</b> ${m.loc} | <b>👤 RESP :</b> ${m.resp}<br><b>📝 NOTES :</b> ${m.note}
         </div></td></tr>`;
     }
 
@@ -216,20 +218,28 @@
         const sCont = document.getElementById('sasList'); const aCont = document.getElementById('archiveList');
         if(!sCont) return;
         sCont.innerHTML = ''; aCont.innerHTML = '';
-        db_missions.filter(m => m.status === 'sas').forEach(m => {
+        db_missions.filter(m => m && m.status === 'sas').forEach(m => {
             sCont.innerHTML += `<div class="card" style="display:flex; justify-content:space-between; align-items:center;">
                 <span><b>${m.pdgId}</b> - ${m.title}</span>
                 <button class="btn-v" onclick="setStatus(${m.id},'archived')">ARCHIVER</button>
             </div>`;
         });
-        db_missions.filter(m => m.status === 'archived').sort((a,b)=>b.id-a.id).forEach(m => {
+        db_missions.filter(m => m && m.status === 'archived').sort((a,b)=>b.id-a.id).forEach(m => {
             aCont.innerHTML += `<div style="padding:10px; border-bottom:1px solid #ccc; background:#fff; margin-bottom:5px; border-radius:8px;"><b>${m.pdgId}</b> - ${m.title}</div>`;
         });
     }
 
-    function setStatus(id, s) { db_missions[db_missions.findIndex(x=>x.id==id)].status = s; saveData(); }
+    function setStatus(id, s) { 
+        const idx = db_missions.findIndex(x=>x.id==id);
+        if(idx !== -1) {
+            db_missions[idx].status = s; 
+            dbRef.set({ data: db_missions, counter: counter_pdg });
+        }
+    }
+
     function editMission(id) { 
         const m = db_missions.find(x=>x.id==id); 
+        if(!m) return;
         document.getElementById('editTaskId').value = m.id; 
         document.getElementById('tTitle').value = m.title; 
         document.getElementById('tLoc').value = m.loc;
@@ -238,9 +248,16 @@
         document.querySelectorAll('input[name="sect"]').forEach(cb => cb.checked = m.sector.includes(cb.value)); 
         window.scrollTo(0,0); 
     }
+
+    function purgeFirebase() {
+        if(confirm("💥 ATTENTION : Voulez-vous vraiment effacer TOUTES les missions ? Cette action est irréversible.")) {
+            dbRef.set({ data: [], counter: 1 });
+            alert("Base de données réinitialisée.");
+        }
+    }
+
     function toggleDrawer(id, d) { const el = document.getElementById(`dr-${id}-${d}`); el.style.display = el.style.display === 'block' ? 'none' : 'block'; }
     function toggleCollapse(d) { if(collapsed.includes(d)) collapsed = collapsed.filter(x=>x!==d); else collapsed.push(d); renderAll(); }
-    function saveData() { dbRef.set({ data: db_missions, counter: counter_pdg }); }
     function setInputsTime() { const n = new Date(); n.setMinutes(n.getMinutes() - n.getTimezoneOffset()); document.getElementById('tStart').value = n.toISOString().slice(0, 16); }
     function resetForm() { document.getElementById('editTaskId').value = ''; document.getElementById('tTitle').value = ''; document.querySelectorAll('input[name="sect"]').forEach(cb=>cb.checked=false); setInputsTime(); }
     function showPage(id, e) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active')); e.target.classList.add('active'); }
