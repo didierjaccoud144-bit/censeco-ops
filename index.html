@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CENSECO 2026 - OPS V11.1 PREMIUM</title>
+    <title>CENSECO 2026 - OPS V11.2 (STABLE)</title>
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
@@ -12,70 +12,46 @@
     
     <style>
         :root { --bg: #f1f5f9; --fids: #ffcc00; --accent: #4338ca; --success: #15803d; --danger: #dc2626; --sas: #f97316; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        
-        /* HEADER PREMIUM */
-        header { background: #000; color: #fff; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--fids); z-index: 1001; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        header { background: #000; color: #fff; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--fids); z-index: 1001; }
         .nav-main { display: flex; background: #fff; border-bottom: 1px solid #cbd5e1; flex-shrink: 0; }
-        .nav-btn { padding: 18px 25px; cursor: pointer; border: none; background: none; font-weight: 900; opacity: 0.4; text-transform: uppercase; font-size: 0.85em; transition: 0.2s; }
+        .nav-btn { padding: 18px 25px; cursor: pointer; border: none; background: none; font-weight: 900; opacity: 0.4; text-transform: uppercase; font-size: 0.85em; }
         .nav-btn.active { opacity: 1; border-bottom: 4px solid var(--accent); color: var(--accent); }
-        
-        .container { flex: 1; overflow-y: auto; padding: 25px; }
+        .container { flex: 1; overflow-y: auto; padding: 20px; }
         .page { display: none; } .page.active { display: block; }
         
-        /* FORMULAIRE TACTIQUE */
-        .card { background: #e2e8f0; padding: 20px; border-radius: 12px; border: 1px solid #cbd5e1; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 10px; }
+        /* DESIGN TABLEAU */
+        .card { background: #e2e8f0; padding: 20px; border-radius: 12px; border: 1px solid #cbd5e1; margin-bottom: 20px; }
+        .row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; margin-bottom: 10px; }
         .field { display: flex; flex-direction: column; gap: 5px; }
         .field label { font-size: 0.65em; font-weight: 900; color: #475569; text-transform: uppercase; }
-        input, select { padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: 800; background: #fff; }
+        input, select { padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-weight: 800; background: #fff; }
         
-        /* TABLEAUX MASTER */
-        .t-table { width: 100%; border-collapse: separate; border-spacing: 0 6px; margin-bottom: 15px; table-layout: fixed; }
-        .t-table th { text-align: left; padding: 10px; font-size: 0.7em; text-transform: uppercase; color: #64748b; font-weight: 900; }
-        .t-row td { background: #fff; padding: 15px; border-top: 1px solid #cbd5e1; border-bottom: 1px solid #cbd5e1; vertical-align: middle; cursor: pointer; }
-        
-        .date-sep { background: #1e293b; color: var(--fids); padding: 12px 18px; font-weight: 900; font-size: 0.9em; border-radius: 8px; margin: 30px 0 10px 0; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); cursor: pointer; }
-        
-        /* PRIORITES */
-        .col-prio { width: 55px; text-align: center; font-weight: 900; border-left: 12px solid transparent; border-radius: 8px 0 0 8px; font-size: 1.1em; }
+        .t-table { width: 100%; border-collapse: separate; border-spacing: 0 5px; margin-bottom: 15px; }
+        .t-row td { background: #fff; padding: 12px; border-top: 1px solid #cbd5e1; border-bottom: 1px solid #cbd5e1; vertical-align: middle; cursor: pointer; }
+        .col-prio { width: 50px; text-align: center; font-weight: 900; border-left: 10px solid transparent; border-radius: 6px 0 0 6px; }
         .prio-0 { border-left-color: #000 !important; }
         .prio-1 { border-left-color: var(--danger) !important; }
         .prio-2 { border-left-color: var(--accent) !important; }
+        .row-p0 td { background-color: #ffff00 !important; color: #000 !important; font-weight: 900; }
         
-        .row-p0 td { background-color: #ffff00 !important; color: #000 !important; border-top: 2px solid #000 !important; border-bottom: 2px solid #000 !important; font-weight: 900; }
-        .row-p1 td { animation: pulse-red 2s infinite; }
-        @keyframes pulse-red { 0%, 100% { background-color: #fff; } 50% { background-color: rgba(220, 38, 38, 0.08); } }
-
-        /* TIMELINE */
-        .vis-container { background: #0f172a !important; border-radius: 12px; border: 2px solid #334155; height: 550px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
-        .vis-label { color: var(--fids) !important; font-weight: bold; background: #1e293b !important; }
-        .vis-time-axis .vis-text { color: var(--fids) !important; font-weight: bold; }
-        .vis-item { border-radius: 4px !important; border-width: 0 0 0 8px !important; font-weight: 800; }
-        .tl-p0 { background: #ffff00 !important; color: #000 !important; border-color: #000 !important; }
-        .tl-p1 { background: #dc2626 !important; color: #fff !important; }
-        .tl-p2 { background: #4338ca !important; color: #fff !important; }
-
-        .btn-v { background: var(--success); color: #fff; border: none; padding: 14px 25px; border-radius: 10px; font-weight: 900; cursor: pointer; box-shadow: 0 4px 0 #065f46; }
-        .btn-v:active { transform: translateY(2px); box-shadow: 0 2px 0 #065f46; }
-        .btn-i { padding: 10px 15px; border-radius: 8px; border: none; color: #fff; font-weight: 900; cursor: pointer; margin-left: 6px; font-size: 0.75em; }
-        
-        .drawer { display: none; padding: 20px; background: #f8fafc; border-left: 15px solid var(--accent); border-radius: 0 0 15px 15px; border-bottom: 1px solid #cbd5e1; line-height: 1.6; }
-        .sect-tag { background: #f1f5f9; padding: 3px 8px; border-radius: 6px; font-size: 0.75em; font-weight: 800; border: 1px solid #cbd5e1; color: #334155; margin-right: 5px; }
-        .footer { text-align: center; padding: 15px; font-size: 0.75em; opacity: 0.5; font-weight: bold; }
+        .date-sep { background: #1e293b; color: var(--fids); padding: 10px 15px; font-weight: 900; font-size: 0.85em; border-radius: 8px; margin: 20px 0 5px 0; display: flex; justify-content: space-between; }
+        .btn-v { background: var(--success); color: #fff; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 900; cursor: pointer; }
+        .btn-i { padding: 8px 12px; border-radius: 6px; border: none; color: #fff; font-weight: 900; cursor: pointer; margin-left: 5px; font-size: 0.7em; }
+        .drawer { display: none; padding: 15px; background: #f8fafc; border-left: 10px solid var(--accent); border-radius: 0 0 8px 8px; border-bottom: 1px solid #cbd5e1; }
     </style>
 </head>
 <body>
 
 <header>
-    <div style="font-weight: 900; font-size: 1.3em; letter-spacing: 1px;">CENSECO 2026 - <span style="color:var(--fids)">OPS V11.1 PREMIUM</span></div>
-    <div id="clock" style="font-family: monospace; color: var(--fids); font-size: 1.4em; font-weight: 900;">00:00:00</div>
+    <div style="font-weight: 900;">CENSECO 2026 - OPS <span style="color:var(--fids)">V11.2 STABLE</span></div>
+    <div id="clock">00:00:00</div>
 </header>
 
 <div class="nav-main">
     <button class="nav-btn active" onclick="showPage('ops', event)">📋 OPERATIONS</button>
     <button class="nav-btn" onclick="showPage('timeline-ops', event)">🗓️ TIMELINE</button>
-    <button class="nav-btn" onclick="showPage('retex', event)">📦 RETEX & ARCHIVES</button>
+    <button class="nav-btn" onclick="showPage('retex', event)">📦 RETEX</button>
 </div>
 
 <div class="container">
@@ -83,21 +59,20 @@
         <div class="card">
             <input type="hidden" id="editTaskId">
             <div class="row">
-                <div id="nextPdgId" style="background:#000;color:var(--fids);padding:15px;border-radius:10px;font-weight:900;border:2px solid var(--fids); font-size:1.2em;">PDG-XXXXX</div>
-                <div class="field" style="flex:1;"><label>Titre de la Mission</label><input type="text" id="tTitle" placeholder="Ex: Recherche Secteur 4"></div>
+                <div id="nextPdgId" style="background:#000;color:var(--fids);padding:10px;border-radius:6px;font-weight:900;border:1px solid var(--fids);">PDG-XXXXX</div>
+                <div class="field" style="flex:1;"><label>Titre Mission</label><input type="text" id="tTitle" placeholder="Libellé"></div>
                 <div class="field"><label>Responsable</label><select id="tResp"></select></div>
-                <div id="sectorGrid" style="display:grid; grid-template-columns:repeat(4,1fr); gap:8px; background:#fff; padding:12px; border-radius:10px; border:1px solid #cbd5e1;"></div>
+                <div id="sectorGrid" style="display:grid; grid-template-columns:repeat(4,1fr); gap:5px; background:#fff; padding:10px; border-radius:8px; border:1px solid #cbd5e1;"></div>
             </div>
             <div class="row">
-                <div class="field"><label>Lieu / Zone</label><input type="text" id="tLoc" style="width:200px;"></div>
+                <div class="field"><label>Lieu</label><input type="text" id="tLoc" style="width:150px;"></div>
                 <div class="field"><label>Début</label><input type="datetime-local" id="tStart"></div>
-                <div class="field"><label>Fin Estimée</label><input type="datetime-local" id="tEnd"></div>
+                <div class="field"><label>Fin</label><input type="datetime-local" id="tEnd"></div>
                 <div class="field"><label>Prio</label>
-                    <select id="tPrio"><option value="0">🚨 P0 (URGENCE)</option><option value="1">P1</option><option value="2" selected>P2</option><option value="3">P3</option></select>
+                    <select id="tPrio"><option value="0">🚨 P0</option><option value="1">P1</option><option value="2" selected>P2</option></select>
                 </div>
-                <div class="field" style="align-items:center;"><label>TL</label><input type="checkbox" id="tTL" checked style="width:22px; height:22px;"></div>
-                <div class="field" style="align-items:center;"><label>CPF</label><input type="checkbox" id="tCPF" style="width:22px; height:22px;"></div>
-                <input type="text" id="tNote" placeholder="Notes tactiques..." style="flex:1">
+                <div class="field"><label>TL</label><input type="checkbox" id="tTL" checked></div>
+                <input type="text" id="tNote" placeholder="Notes..." style="flex:1">
                 <button class="btn-v" onclick="addMission()">VALIDER MISSION</button>
             </div>
         </div>
@@ -110,14 +85,10 @@
     </div>
 
     <div id="retex" class="page">
-        <div style="background:var(--sas); color:#fff; padding:15px; border-radius:10px; font-weight:900; margin-bottom:15px; display:flex; align-items:center; gap:10px;">📥 SAS DE CLÔTURE</div>
         <div id="sasList"></div>
-        <div style="background:var(--accent); color:#fff; padding:15px; border-radius:10px; font-weight:900; margin:30px 0 15px 0;">🗄️ ARCHIVES MISSIONS</div>
         <div id="archiveList"></div>
     </div>
 </div>
-
-<div class="footer">Une création DJA’WEB avec l’aide de Gemini IA</div>
 
 <script>
     const firebaseConfig = {
@@ -144,7 +115,7 @@
 
     window.onload = () => {
         RESPS.forEach(r => document.getElementById('tResp').add(new Option(r, r)));
-        SECTEURS.forEach(s => { document.getElementById('sectorGrid').innerHTML += `<label style="font-size:0.7em; font-weight:800; cursor:pointer;"><input type="checkbox" name="sect" value="${s}"> ${s}</label>`; });
+        SECTEURS.forEach(s => { document.getElementById('sectorGrid').innerHTML += `<label style="font-size:0.7em; font-weight:bold;"><input type="checkbox" name="sect" value="${s}"> ${s}</label>`; });
         initTimeline();
         
         dbRef.on('value', snap => {
@@ -156,7 +127,6 @@
                 renderRetex();
             }
         });
-
         setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('fr-FR'); }, 1000);
         setInputsTime();
     };
@@ -164,7 +134,7 @@
     function addMission() {
         const id = document.getElementById('editTaskId').value;
         const sects = Array.from(document.querySelectorAll('input[name="sect"]:checked')).map(cb => cb.value);
-        if(!document.getElementById('tTitle').value || !sects.length) return alert("⚠️ Erreur : Titre et Secteurs requis.");
+        if(!document.getElementById('tTitle').value || !sects.length) return alert("Données manquantes");
 
         const m = {
             id: id ? parseInt(id) : Date.now(),
@@ -173,24 +143,26 @@
             loc: document.getElementById('tLoc').value, start: document.getElementById('tStart').value,
             end: document.getElementById('tEnd').value || document.getElementById('tStart').value,
             priority: document.getElementById('tPrio').value, timeline: document.getElementById('tTL').checked,
-            cpf: document.getElementById('tCPF').checked, note: document.getElementById('tNote').value,
-            sector: sects, status: 'active'
+            sector: sects, note: document.getElementById('tNote').value, status: 'active'
         };
 
         if(id) db_missions[db_missions.findIndex(x=>x.id==id)] = m;
         else { db_missions.push(m); counter_pdg++; }
-        saveData(); resetForm();
+        dbRef.set({ data: db_missions, counter: counter_pdg });
+        resetForm();
     }
 
     function renderAll() {
         const opCont = document.getElementById('opsList'); const p0Cont = document.getElementById('p0Container');
+        if(!opCont) return;
         opCont.innerHTML = ''; p0Cont.innerHTML = ''; itemsOps.clear();
+
         const active = db_missions.filter(m => m.status === 'active');
 
         // P0 SECTION
         const p0s = active.filter(m => m.priority == 0);
         if(p0s.length) {
-            let h = `<table class="t-table"><thead><tr><th style="width:55px">P</th><th style="width:130px">Horaires</th><th>Mission</th><th style="width:160px">Actions</th></tr></thead><tbody>`;
+            let h = `<table class="t-table"><thead><tr><th style="width:55px">P</th><th style="width:130px">Heure</th><th>Mission</th><th style="width:160px">Actions</th></tr></thead><tbody>`;
             p0s.forEach(m => h += renderRow(m, "P0"));
             p0Cont.innerHTML = h + `</tbody></table>`;
         }
@@ -203,7 +175,7 @@
 
         Object.keys(grouped).forEach(date => {
             const isColl = collapsed.includes(date);
-            opCont.innerHTML += `<div class="date-sep" onclick="toggleCollapse('${date}')"><span>🗓️ ${date.toUpperCase()}</span><span>${isColl?'[+] DÉPLIER':'[-] RÉDUIRE'}</span></div>`;
+            opCont.innerHTML += `<div class="date-sep" onclick="toggleCollapse('${date}')"><span>🗓️ ${date.toUpperCase()}</span><span>${isColl?'[+]':'[-]'}</span></div>`;
             if(!isColl) {
                 let h = `<table class="t-table"><tbody>`;
                 grouped[date].sort((a,b)=>new Date(a.start)-new Date(b.start)).forEach(m => h += renderRow(m, date));
@@ -217,21 +189,16 @@
     function renderRow(m, d) {
         const cleanD = d.replace(/\s/g, '');
         const s = new Date(m.start), e = new Date(m.end);
-        return `<tr class="t-row ${m.priority==0?'row-p0':(m.priority==1?'row-p1':'')}" onclick="toggleDrawer('${m.id}','${cleanD}')">
+        return `<tr class="t-row ${m.priority==0?'row-p0':''}" onclick="toggleDrawer('${m.id}','${cleanD}')">
             <td class="col-prio prio-${m.priority}">P${m.priority}</td>
-            <td style="font-weight:900; font-size:0.85em; color:#1e293b;">${s.getHours()}:${s.getMinutes().toString().padStart(2,'0')}<br>${e.getHours()}:${e.getMinutes().toString().padStart(2,'0')}</td>
-            <td><b>${m.title}</b><br>${m.sector.map(st=>`<span class="sect-tag">${st}</span>`).join('')}</td>
+            <td style="font-weight:bold; font-size:0.85em;">${s.getHours()}:${s.getMinutes().toString().padStart(2,'0')} - ${e.getHours()}:${e.getMinutes().toString().padStart(2,'0')}</td>
+            <td><b>${m.pdgId}</b> - ${m.title}<br><small>${m.sector.join(', ')}</small></td>
             <td style="text-align:right;">
                 <button class="btn-i" style="background:var(--accent)" onclick="event.stopPropagation(); editMission(${m.id})">EDIT</button>
                 <button class="btn-i" style="background:var(--sas)" onclick="event.stopPropagation(); setStatus(${m.id},'sas')">FIN</button>
             </td>
         </tr>
-        <tr><td colspan="4" style="padding:0; border:none;"><div id="dr-${m.id}-${cleanD}" class="drawer"><b>📍 LIEU :</b> ${m.loc || '-'} | <b>👤 RESP :</b> ${m.resp}<br><b>📝 NOTES :</b> ${m.note || '-'}</div></td></tr>`;
-    }
-
-    function initTimeline() {
-        timelineOps = new vis.Timeline(document.getElementById('vis-ops'), itemsOps, groupsOps, { stack: false, showCurrentTime: true });
-        timelineOps.on('click', p => { if(p.items.length) { const m = db_missions.find(x => x.id == p.items[0].split('_')[0]); alert(`🚀 MISSION [${m.pdgId}]\n------------------\n${m.title}\nLieu : ${m.loc}\nNotes : ${m.note}`); }});
+        <tr><td colspan="4" style="padding:0; border:none;"><div id="dr-${m.id}-${cleanD}" class="drawer"><b>Lieu:</b> ${m.loc} | <b>Resp:</b> ${m.resp}<br><b>Notes:</b> ${m.note}</div></td></tr>`;
     }
 
     function renderRetex() {
@@ -239,31 +206,20 @@
         if(!sCont) return;
         sCont.innerHTML = ''; aCont.innerHTML = '';
         db_missions.filter(m => m.status === 'sas').forEach(m => {
-            sCont.innerHTML += `<div class="card" style="display:flex; justify-content:space-between; align-items:center;">
-                <span><b>${m.pdgId}</b> - ${m.title}</span>
-                <div>
-                    <button class="btn-i" style="background:var(--accent)" onclick="setStatus(${m.id},'active')">RÉACTIVER</button>
-                    <button class="btn-v" onclick="setStatus(${m.id},'archived')">ARCHIVER</button>
-                </div>
-            </div>`;
+            sCont.innerHTML += `<div class="card" style="display:flex; justify-content:space-between; align-items:center;"><span><b>${m.pdgId}</b> - ${m.title}</span><button class="btn-v" onclick="setStatus(${m.id},'archived')">ARCHIVER</button></div>`;
         });
-        db_missions.filter(m => m.status === 'archived').sort((a,b)=>b.id-a.id).forEach(m => {
-            aCont.innerHTML += `<div style="padding:10px; border-bottom:1px solid #cbd5e1; background:#fff; margin-bottom:5px; border-radius:8px;"><b>${m.pdgId}</b> - ${m.title}</div>`;
+        db_missions.filter(m => m.status === 'archived').forEach(m => {
+            aCont.innerHTML += `<div style="padding:8px; border-bottom:1px solid #ccc; font-size:0.8em;">📂 ${m.pdgId} - ${m.title}</div>`;
         });
     }
 
-    function saveData() { dbRef.set({ data: db_missions, counter: counter_pdg }); }
-    function setStatus(id, s) { db_missions[db_missions.findIndex(x=>x.id==id)].status = s; saveData(); }
-    function editMission(id) { 
-        const m = db_missions.find(x=>x.id==id); 
-        document.getElementById('editTaskId').value = m.id; 
-        document.getElementById('tTitle').value = m.title; 
-        document.getElementById('tLoc').value = m.loc;
-        document.getElementById('tNote').value = m.note;
-        document.getElementById('tPrio').value = m.priority;
-        document.querySelectorAll('input[name="sect"]').forEach(cb => cb.checked = m.sector.includes(cb.value)); 
-        window.scrollTo(0,0); 
+    function initTimeline() {
+        timelineOps = new vis.Timeline(document.getElementById('vis-ops'), itemsOps, groupsOps, { stack: false, showCurrentTime: true });
+        timelineOps.on('click', p => { if(p.items.length) { const m = db_missions.find(x => x.id == p.items[0].split('_')[0]); alert(`PDG: ${m.pdgId}\n${m.title}\nLieu: ${m.loc}`); }});
     }
+
+    function setStatus(id, s) { db_missions[db_missions.findIndex(x=>x.id==id)].status = s; dbRef.set({ data: db_missions, counter: counter_pdg }); }
+    function editMission(id) { const m = db_missions.find(x=>x.id==id); document.getElementById('editTaskId').value = m.id; document.getElementById('tTitle').value = m.title; window.scrollTo(0,0); }
     function toggleDrawer(id, d) { const el = document.getElementById(`dr-${id}-${d}`); el.style.display = el.style.display === 'block' ? 'none' : 'block'; }
     function toggleCollapse(d) { if(collapsed.includes(d)) collapsed = collapsed.filter(x=>x!==d); else collapsed.push(d); renderAll(); }
     function setInputsTime() { const n = new Date(); n.setMinutes(n.getMinutes() - n.getTimezoneOffset()); document.getElementById('tStart').value = n.toISOString().slice(0, 16); document.getElementById('nextPdgId').innerText = "PDG-"+counter_pdg.toString().padStart(5,'0'); }
