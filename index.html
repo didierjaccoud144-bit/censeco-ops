@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CENSECO 2026 - V28.2 MASTER</title>
+    <title>CENSECO 2026 - V28.4 MASTER</title>
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
@@ -37,7 +37,7 @@
         .quick-btn { background: #334155; border: none; color: white; padding: 5px 10px; border-radius: 3px; font-size: 0.75em; cursor: pointer; font-style: italic; }
         .btn-submit { background: var(--success); color: white; border: none; padding: 12px 30px; border-radius: 6px; font-weight: 900; cursor: pointer; box-shadow: 0 4px 0 #065f46; }
 
-        /* --- LIGNES LOG --- */
+        /* --- LIGNES LOG V20.2 --- */
         .mission-row-container { margin-bottom: 8px; }
         .mission-row { display: flex; align-items: center; background: white; border-radius: 8px; border: 1px solid #cbd5e1; height: 95px; position: relative; overflow: hidden; }
         .row-item { padding: 0 10px; border-right: 1px solid rgba(0,0,0,0.05); height: 100%; display: flex; flex-direction: column; justify-content: center; }
@@ -67,11 +67,19 @@
         .day-sep { background: #000; color: var(--fids); padding: 10px 15px; font-weight: 900; border-radius: 8px; margin: 20px 0 10px 0; cursor: pointer; display: flex; justify-content: space-between; border: 2px solid var(--fids); }
         .p0-emergency-zone { border: 4px solid var(--danger); background: #fff5f5; padding: 10px; border-radius: 12px; margin-bottom: 20px; }
 
-        /* STATS SEXY */
+        /* --- STATS STYLE --- */
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px; }
         .stat-card { background: white; padding: 20px; border-radius: 12px; text-align: center; border-top: 6px solid var(--accent); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .stat-num { font-size: 2.8em; font-weight: 900; display: block; line-height: 1; }
         .chart-box { background: white; padding: 20px; border-radius: 12px; border: 1px solid #cbd5e1; margin-bottom: 20px; }
+        
+        /* HEATMAP HORAIRE */
+        .time-slot-container { display: flex; justify-content: space-between; align-items: flex-end; height: 120px; padding: 10px 20px; background: #f8fafc; border-radius: 12px; gap: 15px; }
+        .time-bar-wrapper { flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; }
+        .time-bar { width: 100%; border-radius: 6px 6px 0 0; min-height: 4px; transition: height 0.8s; position: relative; }
+        .time-bar-val { position: absolute; top: -25px; width: 100%; text-align: center; font-weight: 900; font-size: 0.85em; }
+        .time-bar-label { font-size: 0.65em; font-weight: 900; color: #64748b; margin-top: 8px; text-transform: uppercase; }
+
         .bar-track { background: #e2e8f0; height: 12px; border-radius: 6px; overflow: hidden; margin-top: 5px; }
         .bar-fill { height: 100%; background: var(--accent); transition: width 0.6s; }
     </style>
@@ -79,7 +87,7 @@
 <body>
 
 <header>
-    <div style="font-weight: 900;">CENSECO 2026 - <span style="color:var(--fids)">V28.2 MASTER</span></div>
+    <div style="font-weight: 900;">CENSECO 2026 - <span style="color:var(--fids)">V28.4 MASTER</span></div>
     <div id="clock">00:00:00</div>
 </header>
 
@@ -134,20 +142,15 @@
             <div class="stat-card" style="border-color:var(--accent)"><span class="stat-num" id="stStd" style="color:var(--accent)">0</span>P2 / P3</div>
             <div class="stat-card" style="border-color:var(--success)"><span class="stat-num" id="stDuree" style="color:var(--success)">-</span>DURÉE MOY.</div>
         </div>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
-            <div class="chart-box"><div class="info-label">Secteurs</div><div id="secChart"></div></div>
-            <div class="chart-box"><div class="info-label">Responsables</div><div id="respChart"></div></div>
-        </div>
         <div class="chart-box">
-            <div class="info-label">Créneaux Horaires</div>
-            <div style="display:flex; justify-content:space-around; text-align:center; padding:10px;">
-                <div><small>06h-12h</small><div class="info-val" id="slot1">0</div></div>
-                <div><small>12h-18h</small><div class="info-val" id="slot2">0</div></div>
-                <div><small>18h-00h</small><div class="info-val" id="slot3">0</div></div>
-                <div><small>00h-06h</small><div class="info-val" id="slot4">0</div></div>
-            </div>
+            <div class="t-label" style="margin-bottom:15px; color:var(--dark)">Intensité par Créneaux Horaires</div>
+            <div class="time-slot-container" id="timeSlotVisual"></div>
         </div>
-        <div class="chart-box"><div class="info-label">Suivi GCS/CPF (Total cochés)</div><div id="followChart"></div></div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+            <div class="chart-box"><div class="t-label" style="color:var(--dark)">Secteurs</div><div id="secChart"></div></div>
+            <div class="chart-box"><div class="t-label" style="color:var(--dark)">Responsables</div><div id="respChart"></div></div>
+        </div>
+        <div class="chart-box"><div class="t-label" style="color:var(--dark)">Suivi GCS/CPF (Total cochés)</div><div id="followChart"></div></div>
     </div>
 </div>
 
@@ -252,8 +255,18 @@
             const h = new Date(m.start).getHours();
             if(h >= 6 && h < 12) slots[0]++; else if(h >= 12 && h < 18) slots[1]++; else if(h >= 18 && h < 24) slots[2]++; else slots[3]++;
         });
+
         if(cDuree > 0) { const m = Math.round(totalMin/cDuree); document.getElementById('stDuree').innerText = m > 60 ? Math.floor(m/60)+'h'+(m%60).toString().padStart(2,'0') : m+'m'; }
-        slots.forEach((v, i) => document.getElementById('slot'+(i+1)).innerText = v);
+        
+        // RENDER HEATMAP HORAIRE
+        const slotCont = document.getElementById('timeSlotVisual');
+        const labels = ["06h-12h", "12h-18h", "18h-00h", "00h-06h"];
+        const maxSlot = Math.max(...slots, 1);
+        slotCont.innerHTML = '';
+        slots.forEach((val, i) => {
+            const h = (val / maxSlot) * 80;
+            slotCont.innerHTML += `<div class="time-bar-wrapper"><div class="time-bar" style="height:${h}px; background:${val === maxSlot ? 'var(--danger)' : 'var(--accent)'}"><div class="time-bar-val">${val}</div></div><div class="time-bar-label">${labels[i]}</div></div>`;
+        });
         
         renderBar('secChart', getCounts(active, 'sectors'), 'var(--accent)');
         renderBar('respChart', getCounts(active, 'resp'), 'var(--p3)');
