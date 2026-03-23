@@ -2,75 +2,71 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>CENSECO 2026 - TACTICAL MONITOR V2.1</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CENSECO 2026 - MOBILE MONITOR</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <style>
         :root { 
             --bg: #020617; --fids: #ffcc00; --accent: #38bdf8; 
-            --p0: #ffff00; --p1: #ef4444; --p2: #3b82f6; --p3: #64748b;
+            --p0: #ffff00; --p1: #ef4444; --p2: #3b82f6;
         }
         
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 25px; height: 100vh; display: flex; flex-direction: column; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 10px; box-sizing: border-box; }
         
-        header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 4px solid var(--fids); padding-bottom: 15px; margin-bottom: 30px; flex-shrink: 0; }
-        .clock { font-family: monospace; font-size: 3.5em; font-weight: 900; color: var(--fids); line-height: 1; }
+        header { border-bottom: 3px solid var(--fids); padding: 10px 0; margin-bottom: 20px; text-align: center; }
+        .clock { font-family: monospace; font-size: 2.5em; font-weight: 900; color: var(--fids); margin-top: 5px; }
         
-        .grid-monitor { display: grid; grid-template-columns: repeat(auto-fit, minmax(480px, 1fr)); gap: 25px; align-content: start; overflow-y: auto; flex: 1; }
+        /* LA TUILE VERTICALE HAUTE */
+        .grid-monitor { display: flex; flex-direction: column; gap: 20px; }
         
-        .card { background: #1e293b; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); display: flex; flex-direction: column; border: 1px solid rgba(255,255,255,0.1); transition: transform 0.3s; }
+        .card { 
+            background: #1e293b; 
+            border-radius: 20px; 
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column;
+            min-height: 500px; /* Augmente la hauteur de 3-4 fois */
+            border: 2px solid rgba(255,255,255,0.1);
+        }
         
-        .card-header { padding: 12px 20px; font-weight: 900; font-size: 0.9em; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; background: var(--p2); color: white; }
-        
-        .card.p0 .card-header { background: #000; color: var(--p0); animation: pulse-border 2s infinite; }
+        /* Bandeau de priorité */
+        .card-header { padding: 15px; font-weight: 900; text-align: center; text-transform: uppercase; font-size: 1.2em; background: var(--p2); color: white; }
+        .card.p0 .card-header { background: #000; color: var(--p0); animation: pulse 1.5s infinite; }
         .card.p1 .card-header { background: var(--p1); }
-        .card.p3 .card-header { background: var(--p3); }
 
-        .card-body { padding: 25px; display: flex; flex-direction: column; gap: 12px; }
+        .card-body { padding: 25px; flex: 1; display: flex; flex-direction: column; justify-content: space-around; text-align: center; }
+
+        /* Titre et Lieu en format MASSF */
+        .mission-title { font-size: 3em; font-weight: 900; line-height: 1; margin: 0; color: var(--fids); text-transform: uppercase; }
+        .loc-box { font-size: 2.2em; font-weight: 800; color: #fff; background: rgba(56, 189, 248, 0.2); padding: 15px; border-radius: 12px; margin: 20px 0; border: 1px solid var(--accent); }
         
-        .mission-title { font-size: 2.2em; font-weight: 900; line-height: 1; color: #fff; margin: 0; }
         .card.p0 .mission-title { color: #000; }
-        .card.p0 .card-body { background: var(--p0); color: #000; }
+        .card.p0 .loc-box { color: #000; background: rgba(0,0,0,0.1); border-color: #000; }
+        .card.p0 .card-body { background: var(--p0); }
 
-        .loc-box { font-size: 1.5em; font-weight: 800; color: var(--accent); display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
-        .card.p0 .loc-box { color: #000; border-bottom: 2px solid #000; padding-bottom: 5px; }
+        /* Horaires et Infos */
+        .time-box { font-size: 1.8em; font-weight: 900; color: var(--accent); margin: 15px 0; }
+        .card.p0 .time-box { color: #000; }
 
-        /* NOUVEAU : STYLE HORAIRES */
-        .time-box { display: flex; gap: 15px; align-items: center; background: rgba(0,0,0,0.3); padding: 8px 15px; border-radius: 6px; font-weight: 700; font-size: 0.95em; border-left: 4px solid var(--fids); }
-        .card.p0 .time-box { background: rgba(0,0,0,0.1); border-left-color: #000; }
-        .duration-badge { margin-left: auto; background: var(--accent); color: #000; padding: 2px 8px; border-radius: 4px; font-size: 0.8em; text-transform: uppercase; }
+        .meta-info { font-size: 1.3em; opacity: 0.9; margin-bottom: 20px; }
+        .note { font-style: italic; font-size: 1.1em; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; margin-top: auto; }
 
-        .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .meta-item { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; }
-        .card.p0 .meta-item { background: rgba(0,0,0,0.05); }
-        .meta-label { font-size: 0.7em; text-transform: uppercase; opacity: 0.6; font-weight: 800; display: block; margin-bottom: 4px; }
-        .meta-val { font-size: 1.1em; font-weight: 700; }
-
-        .note { font-style: italic; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; opacity: 0.9; }
-        .card.p0 .note { border-top-color: rgba(0,0,0,0.2); }
-
-        .status-bar { display: flex; gap: 15px; margin-top: 5px; }
-        .badge { padding: 5px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 900; display: flex; align-items: center; gap: 6px; }
+        .status-bar { display: flex; justify-content: center; gap: 20px; padding: 20px; background: rgba(0,0,0,0.4); }
+        .badge { padding: 10px 20px; border-radius: 30px; font-weight: 900; font-size: 1em; }
         .badge.on { background: #15803d; color: white; }
-        .badge.off { background: rgba(0,0,0,0.2); opacity: 0.5; }
+        .badge.off { background: #475569; opacity: 0.5; }
 
-        @keyframes pulse-border {
-            0% { box-shadow: 0 0 0 0px rgba(255, 204, 0, 0.4); }
-            70% { box-shadow: 0 0 0 15px rgba(255, 204, 0, 0); }
-            100% { box-shadow: 0 0 0 0px rgba(255, 204, 0, 0); }
-        }
-
-        .empty { text-align: center; opacity: 0.1; font-size: 4em; font-weight: 900; margin-top: 20vh; width: 100%; grid-column: 1 / -1; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        .empty { text-align: center; opacity: 0.2; font-size: 2em; margin-top: 100px; font-weight: 900; }
     </style>
 </head>
 <body>
 
 <header>
-    <div>
-        <h1 style="margin:0; font-size: 2.2em; text-transform: uppercase; letter-spacing: 2px; font-weight: 900;">Situation Sanitaire</h1>
-        <div id="count" style="font-weight: 800; font-size: 1.4em; color: var(--accent);">0 MISSIONS ACTIVES</div>
-    </div>
+    <div style="font-weight: 900; letter-spacing: 1px; opacity: 0.7;">PDG 2026 - MONITOR</div>
     <div class="clock" id="clock">00:00:00</div>
+    <div id="count" style="font-weight: 800; color: var(--accent); margin-top: 5px;">CHARGEMENT...</div>
 </header>
 
 <div class="grid-monitor" id="monitorBody"></div>
@@ -86,84 +82,40 @@
         renderMonitor(missions);
     });
 
-    function getDuration(start) {
-        if(!start) return "";
-        const diff = Math.floor((new Date() - new Date(start)) / 60000);
-        if(diff < 0) return "Futur";
-        const h = Math.floor(diff / 60);
-        const m = diff % 60;
-        return h > 0 ? `${h}h${m.toString().padStart(2,'0')}` : `${m} min`;
-    }
-
-    function formatH(d) {
-        if(!d) return null;
-        return new Date(d).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
-    }
-
     function renderMonitor(missions) {
         const body = document.getElementById('monitorBody');
-        const activeMissions = missions.filter(m => m.status === 'active' || m.status === 'En cours');
-        
-        document.getElementById('count').innerText = activeMissions.length + " MISSIONS ACTIVES";
+        const activeMissions = missions.filter(m => m.status === 'active');
+        document.getElementById('count').innerText = activeMissions.length + " MISSION(S) EN COURS";
         
         if (activeMissions.length === 0) {
-            body.innerHTML = '<div class="empty">VEILLE OPÉRATIONNELLE</div>';
+            body.innerHTML = '<div class="empty">VEILLE SANITAIRE...</div>';
             return;
         }
 
-        body.innerHTML = activeMissions.sort((a,b) => new Date(a.start) - new Date(b.start)).map(m => {
-            const prioLabel = m.priority === 'p0' ? '🚨 PRIORITÉ ABSOLUE' : 
-                             m.priority === 'p1' ? '⚡ URGENCE P1' : 
-                             m.priority === 'p2' ? '🟢 STANDARD P2' : '⚪ LOGISTIQUE';
-
-            const startH = formatH(m.start);
-            const endH = formatH(m.end);
-            const duration = getDuration(m.start);
-
+        body.innerHTML = activeMissions.map(m => {
+            const hS = m.start ? new Date(m.start).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '--:--';
             return `
-            <div class="card ${m.priority || 'p2'}">
-                <div class="card-header">
-                    <span>${prioLabel}</span>
-                    <span style="opacity:0.7">#${m.pdgId || '---'}</span>
-                </div>
+            <div class="card ${m.priority}">
+                <div class="card-header">${m.priority === 'p0' ? '🚨 PRIORITÉ ABSOLUE' : 'Mission #'+m.pdgId}</div>
                 <div class="card-body">
-                    <h2 class="mission-title">${(m.title || 'Mission sans nom').toUpperCase()}</h2>
-                    <div class="loc-box">📍 ${(m.loc || m.lieu || 'LIEU INCONNU').toUpperCase()}</div>
-                    
-                    <div class="time-box">
-                        <span>DEBUT: ${startH || '--:--'}</span>
-                        ${endH ? `<span>| FIN EST.: ${endH}</span>` : ''}
-                        <span class="duration-badge">Depuis: ${duration}</span>
+                    <div class="time-box">⏱️ DÉBUT : ${hS}</div>
+                    <h1 class="mission-title">${m.title}</h1>
+                    <div class="loc-box">📍 ${m.loc}</div>
+                    <div class="meta-info">
+                        <b>Secteurs :</b> ${m.sectors || 'Tous'}<br>
+                        <b>Resp :</b> ${m.resp}
                     </div>
-
-                    <div class="meta-grid">
-                        <div class="meta-item">
-                            <span class="meta-label">Secteurs</span>
-                            <span class="meta-val">${Array.isArray(m.sectors) ? m.sectors.join(', ') : (m.sectors || 'Tous')}</span>
-                        </div>
-                        <div class="meta-item">
-                            <span class="meta-label">Responsable</span>
-                            <span class="meta-val">${m.resp || 'Non assigné'}</span>
-                        </div>
-                    </div>
-
                     ${m.note ? `<div class="note">"${m.note}"</div>` : ''}
-
-                    <div class="status-bar">
-                        <div class="badge ${m.gcs ? 'on' : 'off'}">${m.gcs ? '✅ GCS ACTIF' : '❌ GCS'}</div>
-                        <div class="badge ${m.cpf ? 'on' : 'off'}">${m.cpf ? '✅ CPF ACTIF' : '❌ CPF'}</div>
-                    </div>
+                </div>
+                <div class="status-bar">
+                    <div class="badge ${m.gcs ? 'on' : 'off'}">GCS</div>
+                    <div class="badge ${m.cpf ? 'on' : 'off'}">CPF</div>
                 </div>
             </div>`;
         }).join('');
     }
 
-    // Rafraîchir les durées toutes les minutes sans recharger Firebase
-    setInterval(() => {
-        document.getElementById('clock').innerText = new Date().toLocaleTimeString('fr-FR');
-        // On pourrait optimiser, mais un simple re-render local fonctionne
-    }, 1000);
+    setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('fr-FR'); }, 1000);
 </script>
-
 </body>
 </html>
