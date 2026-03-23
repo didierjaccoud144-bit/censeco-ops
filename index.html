@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CENSECO 2026 - V27.2 MASTER</title>
+    <title>CENSECO 2026 - V27.3 STABLE</title>
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
@@ -24,7 +24,7 @@
         .container { flex: 1; overflow-y: auto; padding: 15px; box-sizing: border-box; }
         .page { display: none; } .page.active { display: block; }
 
-        /* --- FORMULAIRE V16.2 FULL RESTORED --- */
+        /* --- FORMULAIRE --- */
         .t-form { background: var(--dark); color: white; padding: 20px; border-radius: 8px; margin-bottom: 15px; }
         .t-row { display: flex; gap: 15px; align-items: flex-end; margin-bottom: 12px; }
         .t-col { display: flex; flex-direction: column; gap: 5px; }
@@ -35,35 +35,32 @@
         .btn-prio[data-val="p0"].active { background: #ffff00; color: #000; }
         input { background: #1e293b; border: 1px solid #334155; border-radius: 4px; padding: 10px; color: white; font-size: 1.1em; width: 100%; box-sizing: border-box; }
         .quick-btn { background: #334155; border: none; color: white; padding: 5px 10px; border-radius: 3px; font-size: 0.75em; cursor: pointer; font-style: italic; }
-        .btn-submit { background: var(--success); color: white; border: none; padding: 12px 30px; border-radius: 6px; font-weight: 900; cursor: pointer; box-shadow: 0 4px 0 #065f46; }
+        .btn-submit { background: var(--success); color: white; border: none; padding: 12px 30px; border-radius: 6px; font-weight: 900; cursor: pointer; }
 
-        /* --- SECTION P0 HORS-BANDEAU --- */
-        .p0-emergency-zone { border: 4px solid var(--danger); background: #fef2f2; padding: 10px; border-radius: 12px; margin-bottom: 25px; }
-        .p0-title { background: var(--danger); color: white; padding: 5px 15px; font-weight: 900; border-radius: 6px; display: inline-block; margin-bottom: 10px; font-size: 0.8em; }
+        /* --- P0 EMERGENCY ZONE --- */
+        .p0-emergency-zone { border: 4px solid var(--danger); background: #fff5f5; padding: 15px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(220, 38, 38, 0.1); }
+        .p0-header { color: var(--danger); font-weight: 900; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
 
-        /* --- BANDEAUX DE JOURS --- */
-        .day-sep { background: #000; color: var(--fids); padding: 12px 18px; font-weight: 900; border-radius: 8px; margin: 25px 0 10px 0; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border: 2px solid var(--fids); }
+        /* --- BANDEAUX --- */
+        .day-sep { background: #000; color: var(--fids); padding: 12px 18px; font-weight: 900; border-radius: 8px; margin: 25px 0 10px 0; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
 
-        /* --- LIGNES LOG V20.2 --- */
+        /* --- LIGNES --- */
         .mission-row { display: flex; align-items: center; background: white; margin-bottom: 8px; border-radius: 8px; overflow: hidden; border: 1px solid #cbd5e1; height: 95px; }
         .row-item { padding: 0 15px; border-right: 1px solid rgba(0,0,0,0.05); height: 100%; display: flex; flex-direction: column; justify-content: center; }
         .prio-tab-v { width: 45px; height: 100%; display: flex; align-items: center; justify-content: center; font-weight: 900; color: white; flex-shrink: 0; }
         .mission-row.p0 { background: #ffff00; border: 2px solid #000; } .mission-row.p0 .prio-tab-v { background: #000; color: #ffff00; }
-        .mission-row.p1 { background: #fff1f1; border: 1px solid var(--danger); } .mission-row.p1 .prio-tab-v { background: var(--danger); }
+        .mission-row.p1 { background: #fff1f1; border-left: 5px solid var(--danger); } .mission-row.p1 .prio-tab-v { background: var(--danger); }
         .mission-row.p2 { border-left: 5px solid var(--accent); } .mission-row.p2 .prio-tab-v { background: var(--accent); }
         
-        .info-label { font-size: 0.65em; text-transform: uppercase; opacity: 0.6; font-weight: 900; margin-bottom: 2px; }
-        .info-val { font-weight: 800; font-size: 0.95em; line-height: 1.2; }
         .badge-sect { background: #e2e8f0; color: #1e293b; padding: 2px 6px; border-radius: 4px; font-size: 0.7em; font-weight: 900; margin-right: 3px; border: 1px solid #cbd5e1; }
-        .status-pill { padding: 4px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 900; border: 1px solid #cbd5e1; min-width: 40px; text-align: center; }
+        .status-pill { padding: 4px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 900; border: 1px solid #cbd5e1; }
         .status-on { background: #dcfce7; color: #15803d; border-color: #15803d; }
-        .btn-action { border: none; background: #e2e8f0; padding: 8px 10px; border-radius: 4px; cursor: pointer; font-size: 0.7em; font-weight: 900; }
     </style>
 </head>
 <body>
 
 <header>
-    <div style="font-weight: 900;">CENSECO 2026 - <span style="color:var(--fids)">V27.2 COMMANDER MASTER</span></div>
+    <div style="font-weight: 900;">CENSECO 2026 - <span style="color:var(--fids)">V27.3 STABLE MASTER</span></div>
     <div id="clock">00:00:00</div>
 </header>
 
@@ -89,7 +86,7 @@
                 <div class="btn-opt btn-sect">Med C PDG</div><div class="btn-opt btn-sect">S1 San</div><div class="btn-opt btn-sect">S3 San</div><div class="btn-opt btn-sect">S4 San</div><div class="btn-opt btn-sect">S6 San</div><div class="btn-opt btn-sect">S7 San</div><div class="btn-opt btn-sect">Héli</div><div class="btn-opt btn-sect">Off Li</div>
             </div></div></div>
             <div class="t-row">
-                <div class="t-col" style="flex: 1;"><span class="t-label">Désignation Mission</span><input type="text" id="tTitle"></div>
+                <div class="t-col" style="flex: 1;"><span class="t-label">Désignation Mission</span><input type="text" id="tTitle"><div class="btn-wrap"><button class="quick-btn" onclick="setField('tTitle','Rapport EM San')">EM San</button><button class="quick-btn" onclick="setField('tTitle','Rapport EM PDG')">EM PDG</button></div></div>
                 <div class="t-col" style="flex: 1.5;"><span class="t-label">Lieu</span><input type="text" id="tLoc"><div class="btn-wrap"><button class="quick-btn" onclick="setField('tLoc','Zermatt')">Zermatt</button><button class="quick-btn" onclick="setField('tLoc','Arolla')">Arolla</button><button class="quick-btn" onclick="setField('tLoc','Verbier')">Verbier</button><button class="quick-btn" onclick="setField('tLoc','Sion')">Sion</button></div></div>
             </div>
             <div class="t-row">
@@ -103,13 +100,9 @@
     </div>
 
     <div id="log" class="page">
-        <button class="btn-view-trigger" style="background:#000; color:var(--fids); border:2px solid var(--fids); padding:10px; border-radius:5px; font-weight:900; margin-bottom:15px; cursor:pointer;" onclick="window.open('view.html','_blank')">📺 MONITOR VIEW</button>
         <div id="p0ZoneLog"></div>
         <div id="timelineLog"></div>
     </div>
-    
-    <div id="stats" class="page">...Stats V23.2...</div>
-    <div id="retex" class="page">...Retex Sas...</div>
 </div>
 
 <script>
@@ -130,8 +123,8 @@
 
     function initBtnGroup(cls, cb) { document.querySelectorAll(cls).forEach(b => b.onclick = () => { document.querySelectorAll(cls).forEach(x=>x.classList.remove('active')); b.classList.add('active'); cb(b.getAttribute('data-val') || b.innerText); }); }
     function initBtnMulti(cls, cb) { document.querySelectorAll(cls).forEach(b => b.onclick = () => { b.classList.toggle('active'); cb(Array.from(document.querySelectorAll(cls+'.active')).map(x=>x.innerText)); }); }
-    function adjTime(m) { let n = new Date(); n.setMinutes(n.getMinutes() + m); n.setMinutes(n.getMinutes() - n.getTimezoneOffset()); document.getElementById('tStart').value = n.toISOString().slice(0, 16); }
     function setField(id, v) { document.getElementById(id).value = v; }
+    function adjTime(m) { let n = new Date(); n.setMinutes(n.getMinutes() + m); n.setMinutes(n.getMinutes() - n.getTimezoneOffset()); document.getElementById('tStart').value = n.toISOString().slice(0, 16); }
 
     function addMission() {
         const idField = document.getElementById('editTaskId').value;
@@ -151,58 +144,47 @@
         p0Cont.innerHTML = ''; lineCont.innerHTML = '';
         const active = db_missions.filter(m => m.status === 'active');
 
-        // 1. Extraire et afficher les P0 séparément
-        const p0Missions = active.filter(m => m.priority === 'p0');
-        if(p0Missions.length > 0) {
-            p0Cont.innerHTML = `<div class="p0-emergency-zone"><div class="p0-title">🚨 MISSIONS P0 EN COURS</div></div>`;
-            p0Missions.forEach(m => p0Cont.firstChild.innerHTML += createRowHtml(m));
+        // P0 ISOLÉES
+        const p0s = active.filter(m => m.priority === 'p0');
+        if(p0s.length > 0) {
+            p0Cont.innerHTML = `<div class="p0-emergency-zone"><div class="p0-header">🚨 MISSIONS PRIORITAIRES P0</div></div>`;
+            p0s.forEach(m => p0Cont.firstChild.innerHTML += createRowHtml(m));
         }
 
-        // 2. Extraire et afficher les autres (P1, P2, P3, LOG) par jour
+        // CHRONOLOGIE
         const others = active.filter(m => m.priority !== 'p0');
         const days = {};
         others.forEach(m => {
-            let cur = new Date(m.start.split('T')[0]);
-            let last = m.end ? new Date(m.end.split('T')[0]) : cur;
-            while(cur <= last) {
-                let dStr = cur.toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long'});
+            let start = new Date(m.start.split('T')[0]);
+            let end = m.end ? new Date(m.end.split('T')[0]) : start;
+            let current = new Date(start);
+            // Sécurité : si la boucle bug, on force au moins le jour de début
+            if (isNaN(current.getTime())) current = new Date(); 
+            
+            do {
+                let dStr = current.toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long'});
                 if(!days[dStr]) days[dStr] = [];
-                days[dStr].push(m);
-                cur.setDate(cur.getDate() + 1);
-            }
+                if(!days[dStr].find(x => x.id === m.id)) days[dStr].push(m);
+                current.setDate(current.getDate() + 1);
+            } while (current <= end);
         });
 
         Object.keys(days).sort((a,b) => new Date(a) - new Date(b)).forEach(dStr => {
             const isColl = collapsedDays.includes(dStr);
-            lineCont.innerHTML += `<div class="day-sep" onclick="toggleDay('${dStr}')"><span>🗓️ ${dStr.toUpperCase()}</span><span>${isColl ? '[+] DÉPLIER' : '[-] RÉDUIRE'}</span></div>`;
-            if(!isColl) {
-                days[dStr].sort((a,b) => new Date(a.start) - new Date(b.start)).forEach(m => {
-                    lineCont.innerHTML += createRowHtml(m);
-                });
-            }
+            lineCont.innerHTML += `<div class="day-sep" onclick="toggleDay('${dStr}')"><span>🗓️ ${dStr.toUpperCase()}</span><span>${isColl ? '[+]' : '[-]'}</span></div>`;
+            if(!isColl) days[dStr].forEach(m => lineCont.innerHTML += createRowHtml(m));
         });
     }
 
     function createRowHtml(m) {
-        return `
-        <div class="mission-row ${m.priority}">
+        return `<div class="mission-row ${m.priority}">
             <div class="prio-tab-v">${m.priority.toUpperCase()}</div>
-            <div class="row-item" style="width:130px;">
-                <span class="info-label">DATE / HEURE</span>
-                <span class="info-val" style="font-size:0.7em">${m.start.replace('T',' ')}</span>
-                <span class="info-val" style="font-size:0.7em; opacity:0.5">${m.end ? m.end.replace('T',' ') : '--'}</span>
-            </div>
-            <div class="row-item" style="width:100px;"><span class="info-label">ID</span><span class="info-val" style="color:var(--accent)">${m.pdgId}</span></div>
-            <div class="row-item" style="flex:2;">
-                <span class="info-val">${m.title}</span>
-                <div style="margin-top:4px;">${m.sectors.map(s => `<span class="badge-sect">${s}</span>`).join('')}</div>
-            </div>
-            <div class="row-item" style="width:120px;"><span class="info-label">RESP.</span><span class="info-val">${m.resp || '-'}</span></div>
+            <div class="row-item" style="width:130px;"><span class="info-label">TEMPS</span><span style="font-size:0.7em">D: ${m.start.replace('T',' ')}</span><span style="font-size:0.7em; opacity:0.5">F: ${m.end ? m.end.replace('T',' ') : '--'}</span></div>
+            <div class="row-item" style="width:100px;"><span class="info-label">ID</span><span style="color:var(--accent); font-weight:900">${m.pdgId}</span></div>
+            <div class="row-item" style="flex:2;"><b>${m.title}</b><div style="margin-top:4px;">${m.sectors.map(s => `<span class="badge-sect">${s}</span>`).join('')}</div></div>
+            <div class="row-item" style="width:120px;"><span class="info-label">RESP.</span><b>${m.resp}</b></div>
             <div class="row-item" style="width:100px;"><div style="display:flex; gap:3px;"><span class="status-pill ${m.gcs?'status-on':''}">GCS</span><span class="status-pill ${m.cpf?'status-on':''}">CPF</span></div></div>
-            <div class="row-item" style="border:none; flex-direction:row; gap:5px;">
-                <button class="btn-action" onclick="editMission(${m.id})">EDIT</button>
-                <button class="btn-action" style="background:var(--success); color:white" onclick="archiveMission(${m.id})">FIN</button>
-            </div>
+            <div class="row-item" style="border:none; flex-direction:row; gap:5px;"><button class="btn-action" onclick="editMission(${m.id})">EDIT</button><button class="btn-action" style="background:var(--success); color:white" onclick="archiveMission(${m.id})">FIN</button></div>
         </div>`;
     }
 
