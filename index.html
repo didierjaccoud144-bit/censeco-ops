@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CENSECO 2026 - V27.6 PRECISION</title>
+    <title>CENSECO 2026 - V27.7 SECURITY</title>
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
     <style>
         :root { 
@@ -30,7 +29,7 @@
         .t-col { display: flex; flex-direction: column; gap: 5px; }
         .t-label { font-size: 0.75em; font-weight: 900; color: #94a3b8; text-transform: uppercase; }
         .btn-wrap { display: flex; flex-wrap: wrap; gap: 5px; }
-        .btn-opt { background: #1e293b; border: 1px solid #334155; color: #cbd5e1; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-size: 0.85em; font-weight: 700; }
+        .btn-opt { background: #1e293b; border: 1px solid #334155; color: #cbd5e1; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-size: 0.85em; font-weight: 700; transition: 0.2s; }
         .btn-opt.active { background: var(--accent); color: white; border-color: #818cf8; }
         .btn-prio[data-val="p0"].active { background: #ffff00; color: #000; }
         .btn-prio[data-val="p3"].active { background: var(--p3); color: white; }
@@ -53,9 +52,14 @@
         .info-val { font-weight: 800; font-size: 0.9em; line-height: 1.1; }
         .badge-sect { background: #e2e8f0; color: #1e293b; padding: 1px 4px; border-radius: 3px; font-size: 0.65em; font-weight: 900; margin-right: 2px; border: 1px solid #cbd5e1; }
         
-        .status-pill { padding: 3px 6px; border-radius: 50px; font-size: 0.7em; font-weight: 900; border: 1px solid #cbd5e1; min-width: 35px; text-align: center; color: #94a3b8; }
-        .status-on { background: #dcfce7; color: #15803d; border-color: #15803d; }
+        /* ALERTE GCS/CPF EN COLONNE */
+        .status-col { display: flex; flex-direction: column; gap: 4px; align-items: center; min-width: 50px; }
+        .status-pill { width: 45px; padding: 2px 0; border-radius: 4px; font-size: 0.65em; font-weight: 900; text-align: center; border: 1px solid #cbd5e1; transition: 0.3s; }
+        .status-off { background: var(--danger); color: white; border-color: var(--danger); }
+        .status-on { background: var(--success); color: white; border-color: var(--success); }
+        
         .btn-action { border: none; background: #e2e8f0; padding: 6px 8px; border-radius: 4px; cursor: pointer; font-size: 0.65em; font-weight: 900; text-transform: uppercase; }
+        .btn-fin { background: var(--danger) !important; color: white !important; box-shadow: 0 2px 0 #991b1b; }
 
         .day-sep { background: #000; color: var(--fids); padding: 10px 15px; font-weight: 900; border-radius: 8px; margin: 20px 0 10px 0; cursor: pointer; display: flex; justify-content: space-between; border: 2px solid var(--fids); }
         .p0-emergency-zone { border: 4px solid var(--danger); background: #fff5f5; padding: 10px; border-radius: 12px; margin-bottom: 20px; }
@@ -64,7 +68,7 @@
 <body>
 
 <header>
-    <div style="font-weight: 900;">CENSECO 2026 - <span style="color:var(--fids)">V27.6 OPS</span></div>
+    <div style="font-weight: 900;">CENSECO 2026 - <span style="color:var(--fids)">V27.7 SECURITY MASTER</span></div>
     <div id="clock">00:00:00</div>
 </header>
 
@@ -95,8 +99,8 @@
             </div>
             <div class="t-row">
                 <div class="t-col" style="flex: 2.5;"><span class="t-label">Notes Tactiques</span><input type="text" id="tNote"></div>
-                <div class="t-col" style="flex: 1;"><span class="t-label">Suivi</span><div class="btn-wrap" style="padding:10px;"><label style="font-weight:900; cursor:pointer;"><input type="checkbox" id="checkGCS"> GCS</label><label style="font-weight:900; cursor:pointer; margin-left:10px;"><input type="checkbox" id="checkCPF"> CPF</label></div></div>
-                <div style="display:flex; gap:10px; margin-left:auto;"><button onclick="resetForm()" class="btn-opt">EFFACER</button><button class="btn-submit" onclick="addMission()">VALIDER</button></div>
+                <div class="t-col" style="flex: 1;"><span class="t-label">Suivi Dossier</span><div class="btn-wrap" style="padding:10px;"><label style="font-weight:900; cursor:pointer;"><input type="checkbox" id="checkGCS"> GCS</label><label style="font-weight:900; cursor:pointer; margin-left:10px;"><input type="checkbox" id="checkCPF"> CPF</label></div></div>
+                <div style="display:flex; gap:10px; margin-left:auto;"><button onclick="resetForm()" class="btn-opt">EFFACER</button><button class="btn-submit" onclick="addMission()">VALIDER MISSION</button></div>
             </div>
         </div>
         <div id="p0ZoneOps"></div>
@@ -144,10 +148,9 @@
         p0Cont.innerHTML = ''; lineCont.innerHTML = '';
         const active = db_missions.filter(m => m && m.status === 'active');
 
-        // P0 ISOLÉES
         const p0s = active.filter(m => m.priority === 'p0');
         if(p0s.length > 0) {
-            p0Cont.innerHTML = `<div class="p0-emergency-zone"><div style="color:red; font-weight:900; margin-bottom:5px;">🚨 P0 EN COURS</div></div>`;
+            p0Cont.innerHTML = `<div class="p0-emergency-zone"><div style="color:red; font-weight:900; margin-bottom:5px;">🚨 MISSIONS P0 EN COURS</div></div>`;
             p0s.forEach(m => p0Cont.firstChild.innerHTML += createRowHtml(m));
         }
 
@@ -181,18 +184,23 @@
             <div class="row-item" style="width:85px;"><span class="info-label">ID PDG</span><span class="info-val" style="color:var(--accent)">${m.pdgId}</span></div>
             <div class="row-item" style="flex:2;"><span class="info-val">${m.title}</span><div style="margin-top:4px;"><span style="color:var(--danger); font-weight:900; font-size:0.75em; margin-right:8px;">📍 ${m.loc}</span>${m.sectors ? m.sectors.map(s => `<span class="badge-sect">${s}</span>`).join('') : ''}</div></div>
             <div class="row-item" style="width:100px;"><span class="info-label">RESP.</span><span class="info-val">${m.resp || '-'}</span></div>
-            <div class="row-item" style="width:85px;"><div style="display:flex; gap:3px;"><span class="status-pill ${m.gcs?'status-on':''}">GCS</span><span class="status-pill ${m.cpf?'status-on':''}">CPF</span></div></div>
+            <div class="row-item" style="width:65px;">
+                <div class="status-col">
+                    <div class="status-pill ${m.gcs ? 'status-on' : 'status-off'}">GCS</div>
+                    <div class="status-pill ${m.cpf ? 'status-on' : 'status-off'}">CPF</div>
+                </div>
+            </div>
             <div class="row-item" style="border:none; flex-direction:row; gap:4px;">
                 <button class="btn-action" onclick="shareWA('${m.pdgId}','${m.title}','${m.loc}')" style="background:#25D366; color:white;">WA</button>
                 <button class="btn-action" onclick="editMission(${m.id})">EDIT</button>
-                <button class="btn-action" style="background:var(--success); color:white" onclick="archiveMission(${m.id})">FIN</button>
+                <button class="btn-action btn-fin" onclick="archiveMission(${m.id})">FIN</button>
             </div>
         </div>`;
     }
 
     function shareWA(id, t, l) { window.open(`https://wa.me/?text=${encodeURIComponent('*'+id+'* - '+t+'\n📍 '+l)}`); }
     function toggleDay(d) { if(collapsedDays.includes(d)) collapsedDays = collapsedDays.filter(x => x !== d); else collapsedDays.push(d); renderAll(); }
-    function archiveMission(id) { const idx = db_missions.findIndex(x=>x.id==id); db_missions[idx].status='archived'; dbRef.set({data:db_missions, counter:counter_pdg}); }
+    function archiveMission(id) { if(confirm("Clôturer définitivement cette mission ?")) { const idx = db_missions.findIndex(x=>x.id==id); db_missions[idx].status='archived'; dbRef.set({data:db_missions, counter:counter_pdg}); } }
     function editMission(id) { const m = db_missions.find(x=>x.id==id); document.getElementById('editTaskId').value = m.id; document.getElementById('tTitle').value = m.title; document.getElementById('tLoc').value = m.loc; document.getElementById('tStart').value = m.start; document.getElementById('tEnd').value = m.end; showPage('ops', document.querySelectorAll('.nav-btn')[0]); }
     function resetForm() { document.getElementById('editTaskId').value=''; document.getElementById('tTitle').value=''; document.getElementById('tLoc').value=''; adjTime(0); document.querySelectorAll('.btn-opt').forEach(x=>x.classList.remove('active')); }
     function showPage(id, e) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active')); (e.target || e).classList.add('active'); }
