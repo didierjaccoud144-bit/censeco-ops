@@ -2,48 +2,78 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>CENSECO 2026 - MONITOR VIEW</title>
+    <title>CENSECO 2026 - TACTICAL MONITOR V2.1</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <style>
-        :root { --bg: #0f172a; --fids: #ffcc00; --accent: #38bdf8; --p0: #ffff00; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 20px; height: 100vh; display: flex; flex-direction: column; box-sizing: border-box; }
-        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--fids); padding-bottom: 10px; margin-bottom: 20px; flex-shrink: 0; }
-        .clock { font-family: monospace; font-size: 2.5em; font-weight: 900; color: var(--fids); }
-        .grid-monitor { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; align-content: start; overflow-y: auto; flex: 1; }
+        :root { 
+            --bg: #020617; --fids: #ffcc00; --accent: #38bdf8; 
+            --p0: #ffff00; --p1: #ef4444; --p2: #3b82f6; --p3: #64748b;
+        }
         
-        .card { background: #1e293b; border-radius: 12px; padding: 25px; border-left: 12px solid var(--accent); position: relative; box-shadow: 0 10px 20px rgba(0,0,0,0.4); display: flex; flex-direction: column; gap: 10px; }
-        .card.p0 { border-left-color: #000; background: var(--p0); color: #000; }
-        .card.p1 { border-left-color: #ef4444; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 25px; height: 100vh; display: flex; flex-direction: column; box-sizing: border-box; }
         
-        .card-h { display: flex; justify-content: space-between; align-items: flex-start; }
-        .mission-title { font-size: 1.6em; font-weight: 900; line-height: 1.1; flex: 1; padding-right: 10px; }
-        .pdg-id { background: rgba(0,0,0,0.2); padding: 4px 10px; border-radius: 6px; font-weight: 900; font-size: 1.1em; border: 1px solid rgba(255,255,255,0.2); }
-        .card.p0 .pdg-id { background: rgba(0,0,0,0.1); border-color: rgba(0,0,0,0.2); }
+        header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 4px solid var(--fids); padding-bottom: 15px; margin-bottom: 30px; flex-shrink: 0; }
+        .clock { font-family: monospace; font-size: 3.5em; font-weight: 900; color: var(--fids); line-height: 1; }
         
-        .loc { color: var(--accent); font-size: 1.3em; font-weight: 800; text-transform: uppercase; }
-        .card.p0 .loc { color: #000; text-decoration: underline; }
+        .grid-monitor { display: grid; grid-template-columns: repeat(auto-fit, minmax(480px, 1fr)); gap: 25px; align-content: start; overflow-y: auto; flex: 1; }
         
-        .details { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; font-size: 0.95em; }
-        .card.p0 .details { background: rgba(0,0,0,0.05); }
+        .card { background: #1e293b; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); display: flex; flex-direction: column; border: 1px solid rgba(255,255,255,0.1); transition: transform 0.3s; }
         
-        .note { font-style: italic; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; margin-top: 5px; opacity: 0.9; }
-        .empty { text-align: center; opacity: 0.2; font-size: 3em; font-weight: 900; margin-top: 15vh; width: 100%; grid-column: 1 / -1; }
+        .card-header { padding: 12px 20px; font-weight: 900; font-size: 0.9em; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; background: var(--p2); color: white; }
+        
+        .card.p0 .card-header { background: #000; color: var(--p0); animation: pulse-border 2s infinite; }
+        .card.p1 .card-header { background: var(--p1); }
+        .card.p3 .card-header { background: var(--p3); }
+
+        .card-body { padding: 25px; display: flex; flex-direction: column; gap: 12px; }
+        
+        .mission-title { font-size: 2.2em; font-weight: 900; line-height: 1; color: #fff; margin: 0; }
+        .card.p0 .mission-title { color: #000; }
+        .card.p0 .card-body { background: var(--p0); color: #000; }
+
+        .loc-box { font-size: 1.5em; font-weight: 800; color: var(--accent); display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+        .card.p0 .loc-box { color: #000; border-bottom: 2px solid #000; padding-bottom: 5px; }
+
+        /* NOUVEAU : STYLE HORAIRES */
+        .time-box { display: flex; gap: 15px; align-items: center; background: rgba(0,0,0,0.3); padding: 8px 15px; border-radius: 6px; font-weight: 700; font-size: 0.95em; border-left: 4px solid var(--fids); }
+        .card.p0 .time-box { background: rgba(0,0,0,0.1); border-left-color: #000; }
+        .duration-badge { margin-left: auto; background: var(--accent); color: #000; padding: 2px 8px; border-radius: 4px; font-size: 0.8em; text-transform: uppercase; }
+
+        .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .meta-item { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; }
+        .card.p0 .meta-item { background: rgba(0,0,0,0.05); }
+        .meta-label { font-size: 0.7em; text-transform: uppercase; opacity: 0.6; font-weight: 800; display: block; margin-bottom: 4px; }
+        .meta-val { font-size: 1.1em; font-weight: 700; }
+
+        .note { font-style: italic; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; opacity: 0.9; }
+        .card.p0 .note { border-top-color: rgba(0,0,0,0.2); }
+
+        .status-bar { display: flex; gap: 15px; margin-top: 5px; }
+        .badge { padding: 5px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 900; display: flex; align-items: center; gap: 6px; }
+        .badge.on { background: #15803d; color: white; }
+        .badge.off { background: rgba(0,0,0,0.2); opacity: 0.5; }
+
+        @keyframes pulse-border {
+            0% { box-shadow: 0 0 0 0px rgba(255, 204, 0, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(255, 204, 0, 0); }
+            100% { box-shadow: 0 0 0 0px rgba(255, 204, 0, 0); }
+        }
+
+        .empty { text-align: center; opacity: 0.1; font-size: 4em; font-weight: 900; margin-top: 20vh; width: 100%; grid-column: 1 / -1; }
     </style>
 </head>
 <body>
 
 <header>
     <div>
-        <h1 style="margin:0; font-size: 1.8em; text-transform: uppercase; letter-spacing: 1px;">SITUATION SANITAIRE <span style="color:var(--fids)">PDG 2026</span></h1>
-        <div id="count" style="font-weight: 900; font-size: 1.2em; color: #94a3b8;">Initialisation...</div>
+        <h1 style="margin:0; font-size: 2.2em; text-transform: uppercase; letter-spacing: 2px; font-weight: 900;">Situation Sanitaire</h1>
+        <div id="count" style="font-weight: 800; font-size: 1.4em; color: var(--accent);">0 MISSIONS ACTIVES</div>
     </div>
     <div class="clock" id="clock">00:00:00</div>
 </header>
 
-<div class="grid-monitor" id="monitorBody">
-    <div class="empty">CHARGEMENT DES DONNÉES...</div>
-</div>
+<div class="grid-monitor" id="monitorBody"></div>
 
 <script>
     const firebaseConfig = { apiKey: "AIzaSyA7zWuD_8yzhWARz-lSdHmDrcr7M9kHFHU", authDomain: "censeco-2026.firebaseapp.com", databaseURL: "https://censeco-2026-default-rtdb.europe-west1.firebasedatabase.app", projectId: "censeco-2026", storageBucket: "censeco-2026.firebasestorage.app", messagingSenderId: "1030152312862", appId: "1:1030152312862:web:9618132ec2bcfc7831b60f" };
@@ -52,53 +82,86 @@
 
     dbRef.on('value', snap => {
         const data = snap.val();
-        // Vérifie si les données existent dans .data (Master) ou à la racine
-        let missions = [];
-        if (data) {
-            if (data.data) missions = data.data;
-            else if (Array.isArray(data)) missions = data;
-        }
+        let missions = (data && data.data) ? data.data : [];
         renderMonitor(missions);
     });
+
+    function getDuration(start) {
+        if(!start) return "";
+        const diff = Math.floor((new Date() - new Date(start)) / 60000);
+        if(diff < 0) return "Futur";
+        const h = Math.floor(diff / 60);
+        const m = diff % 60;
+        return h > 0 ? `${h}h${m.toString().padStart(2,'0')}` : `${m} min`;
+    }
+
+    function formatH(d) {
+        if(!d) return null;
+        return new Date(d).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
+    }
 
     function renderMonitor(missions) {
         const body = document.getElementById('monitorBody');
         const activeMissions = missions.filter(m => m.status === 'active' || m.status === 'En cours');
         
-        document.getElementById('count').innerText = activeMissions.length + " MISSIONS EN COURS";
+        document.getElementById('count').innerText = activeMissions.length + " MISSIONS ACTIVES";
         
         if (activeMissions.length === 0) {
-            body.innerHTML = '<div class="empty">AUCUNE MISSION EN COURS</div>';
+            body.innerHTML = '<div class="empty">VEILLE OPÉRATIONNELLE</div>';
             return;
         }
 
-        body.innerHTML = activeMissions.map(m => {
-            // Sécurité pour les noms de champs
-            const title = m.title || m.nom || "Mission Sans Nom";
-            const id = m.pdgId || m.id || "PDG-???";
-            const lieu = m.loc || m.lieu || "Lieu non précisé";
-            const secteurs = Array.isArray(m.sectors) ? m.sectors.join(', ') : (m.secteur || "Tous");
-            const responsable = m.resp || m.responsable || "NC";
-            const note = m.note || m.remarque || "";
+        body.innerHTML = activeMissions.sort((a,b) => new Date(a.start) - new Date(b.start)).map(m => {
+            const prioLabel = m.priority === 'p0' ? '🚨 PRIORITÉ ABSOLUE' : 
+                             m.priority === 'p1' ? '⚡ URGENCE P1' : 
+                             m.priority === 'p2' ? '🟢 STANDARD P2' : '⚪ LOGISTIQUE';
+
+            const startH = formatH(m.start);
+            const endH = formatH(m.end);
+            const duration = getDuration(m.start);
 
             return `
             <div class="card ${m.priority || 'p2'}">
-                <div class="card-h">
-                    <span class="mission-title">${title.toUpperCase()}</span>
-                    <span class="pdg-id">${id}</span>
+                <div class="card-header">
+                    <span>${prioLabel}</span>
+                    <span style="opacity:0.7">#${m.pdgId || '---'}</span>
                 </div>
-                <div class="loc">📍 ${lieu}</div>
-                <div class="details">
-                    <div><b>Secteur(s):</b> ${secteurs}</div>
-                    <div><b>Resp:</b> ${responsable}</div>
+                <div class="card-body">
+                    <h2 class="mission-title">${(m.title || 'Mission sans nom').toUpperCase()}</h2>
+                    <div class="loc-box">📍 ${(m.loc || m.lieu || 'LIEU INCONNU').toUpperCase()}</div>
+                    
+                    <div class="time-box">
+                        <span>DEBUT: ${startH || '--:--'}</span>
+                        ${endH ? `<span>| FIN EST.: ${endH}</span>` : ''}
+                        <span class="duration-badge">Depuis: ${duration}</span>
+                    </div>
+
+                    <div class="meta-grid">
+                        <div class="meta-item">
+                            <span class="meta-label">Secteurs</span>
+                            <span class="meta-val">${Array.isArray(m.sectors) ? m.sectors.join(', ') : (m.sectors || 'Tous')}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Responsable</span>
+                            <span class="meta-val">${m.resp || 'Non assigné'}</span>
+                        </div>
+                    </div>
+
+                    ${m.note ? `<div class="note">"${m.note}"</div>` : ''}
+
+                    <div class="status-bar">
+                        <div class="badge ${m.gcs ? 'on' : 'off'}">${m.gcs ? '✅ GCS ACTIF' : '❌ GCS'}</div>
+                        <div class="badge ${m.cpf ? 'on' : 'off'}">${m.cpf ? '✅ CPF ACTIF' : '❌ CPF'}</div>
+                    </div>
                 </div>
-                ${note ? `<div class="note">"${note}"</div>` : ''}
             </div>`;
         }).join('');
     }
 
+    // Rafraîchir les durées toutes les minutes sans recharger Firebase
     setInterval(() => {
         document.getElementById('clock').innerText = new Date().toLocaleTimeString('fr-FR');
+        // On pourrait optimiser, mais un simple re-render local fonctionne
     }, 1000);
 </script>
 
