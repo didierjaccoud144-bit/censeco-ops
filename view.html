@@ -7,76 +7,94 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <style>
         :root { --bg: #0f172a; --fids: #ffcc00; --accent: #38bdf8; --p0: #ffff00; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 20px; overflow: hidden; height: 100vh; display: flex; flex-direction: column; }
-        
-        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--fids); padding-bottom: 10px; margin-bottom: 20px; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 20px; height: 100vh; display: flex; flex-direction: column; box-sizing: border-box; }
+        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--fids); padding-bottom: 10px; margin-bottom: 20px; flex-shrink: 0; }
         .clock { font-family: monospace; font-size: 2.5em; font-weight: 900; color: var(--fids); }
+        .grid-monitor { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; align-content: start; overflow-y: auto; flex: 1; }
         
-        .grid-monitor { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 15px; flex: 1; overflow-y: auto; }
-        
-        .card { background: #1e293b; border-radius: 12px; padding: 20px; border-left: 10px solid var(--accent); position: relative; box-shadow: 0 10px 15px rgba(0,0,0,0.3); }
+        .card { background: #1e293b; border-radius: 12px; padding: 25px; border-left: 12px solid var(--accent); position: relative; box-shadow: 0 10px 20px rgba(0,0,0,0.4); display: flex; flex-direction: column; gap: 10px; }
         .card.p0 { border-left-color: #000; background: var(--p0); color: #000; }
         .card.p1 { border-left-color: #ef4444; }
         
-        .card-h { display: flex; justify-content: space-between; font-weight: 900; font-size: 1.2em; margin-bottom: 10px; }
-        .pdg-id { background: rgba(0,0,0,0.1); padding: 2px 8px; border-radius: 4px; font-size: 0.8em; }
-        .loc { color: var(--accent); font-weight: 700; display: block; margin-top: 5px; }
+        .card-h { display: flex; justify-content: space-between; align-items: flex-start; }
+        .mission-title { font-size: 1.6em; font-weight: 900; line-height: 1.1; flex: 1; padding-right: 10px; }
+        .pdg-id { background: rgba(0,0,0,0.2); padding: 4px 10px; border-radius: 6px; font-weight: 900; font-size: 1.1em; border: 1px solid rgba(255,255,255,0.2); }
+        .card.p0 .pdg-id { background: rgba(0,0,0,0.1); border-color: rgba(0,0,0,0.2); }
+        
+        .loc { color: var(--accent); font-size: 1.3em; font-weight: 800; text-transform: uppercase; }
         .card.p0 .loc { color: #000; text-decoration: underline; }
         
-        .empty { text-align: center; opacity: 0.3; font-size: 2em; margin-top: 100px; width: 100%; grid-column: 1 / -1; }
+        .details { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; font-size: 0.95em; }
+        .card.p0 .details { background: rgba(0,0,0,0.05); }
+        
+        .note { font-style: italic; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; margin-top: 5px; opacity: 0.9; }
+        .empty { text-align: center; opacity: 0.2; font-size: 3em; font-weight: 900; margin-top: 15vh; width: 100%; grid-column: 1 / -1; }
     </style>
 </head>
 <body>
 
 <header>
     <div>
-        <h1 style="margin:0; font-size: 1.5em; text-transform: uppercase;">Situation Sanitaire <span style="color:var(--fids)">PDG 2026</span></h1>
-        <div id="count" style="font-weight: bold; opacity: 0.7;">0 Missions en cours</div>
+        <h1 style="margin:0; font-size: 1.8em; text-transform: uppercase; letter-spacing: 1px;">SITUATION SANITAIRE <span style="color:var(--fids)">PDG 2026</span></h1>
+        <div id="count" style="font-weight: 900; font-size: 1.2em; color: #94a3b8;">Initialisation...</div>
     </div>
     <div class="clock" id="clock">00:00:00</div>
 </header>
 
 <div class="grid-monitor" id="monitorBody">
-    </div>
+    <div class="empty">CHARGEMENT DES DONNÉES...</div>
+</div>
 
 <script>
-    // CONFIG FIREBASE (Identique à ton Master)
     const firebaseConfig = { apiKey: "AIzaSyA7zWuD_8yzhWARz-lSdHmDrcr7M9kHFHU", authDomain: "censeco-2026.firebaseapp.com", databaseURL: "https://censeco-2026-default-rtdb.europe-west1.firebasedatabase.app", projectId: "censeco-2026", storageBucket: "censeco-2026.firebasestorage.app", messagingSenderId: "1030152312862", appId: "1:1030152312862:web:9618132ec2bcfc7831b60f" };
     firebase.initializeApp(firebaseConfig);
     const dbRef = firebase.database().ref('missions_pdg');
 
     dbRef.on('value', snap => {
         const data = snap.val();
-        const missions = data && data.data ? data.data : [];
+        // Vérifie si les données existent dans .data (Master) ou à la racine
+        let missions = [];
+        if (data) {
+            if (data.data) missions = data.data;
+            else if (Array.isArray(data)) missions = data;
+        }
         renderMonitor(missions);
     });
 
     function renderMonitor(missions) {
         const body = document.getElementById('monitorBody');
-        const activeMissions = missions.filter(m => m.status === 'active');
+        const activeMissions = missions.filter(m => m.status === 'active' || m.status === 'En cours');
         
-        document.getElementById('count').innerText = activeMissions.length + " Missions en cours";
+        document.getElementById('count').innerText = activeMissions.length + " MISSIONS EN COURS";
         
         if (activeMissions.length === 0) {
             body.innerHTML = '<div class="empty">AUCUNE MISSION EN COURS</div>';
             return;
         }
 
-        body.innerHTML = activeMissions.sort((a,b) => new Date(a.start) - new Date(b.start)).map(m => `
-            <div class="card ${m.priority}">
+        body.innerHTML = activeMissions.map(m => {
+            // Sécurité pour les noms de champs
+            const title = m.title || m.nom || "Mission Sans Nom";
+            const id = m.pdgId || m.id || "PDG-???";
+            const lieu = m.loc || m.lieu || "Lieu non précisé";
+            const secteurs = Array.isArray(m.sectors) ? m.sectors.join(', ') : (m.secteur || "Tous");
+            const responsable = m.resp || m.responsable || "NC";
+            const note = m.note || m.remarque || "";
+
+            return `
+            <div class="card ${m.priority || 'p2'}">
                 <div class="card-h">
-                    <span>${m.title}</span>
-                    <span class="pdg-id">${m.pdgId}</span>
+                    <span class="mission-title">${title.toUpperCase()}</span>
+                    <span class="pdg-id">${id}</span>
                 </div>
-                <span class="loc">📍 ${m.loc}</span>
-                <div style="margin-top:15px; font-size: 0.9em; opacity: 0.8;">
-                    <b>Secteurs:</b> ${m.sectors.join(', ')} | <b>Resp:</b> ${m.resp || 'N/A'}
+                <div class="loc">📍 ${lieu}</div>
+                <div class="details">
+                    <div><b>Secteur(s):</b> ${secteurs}</div>
+                    <div><b>Resp:</b> ${responsable}</div>
                 </div>
-                <div style="margin-top:10px; font-style: italic; font-size: 0.85em; border-top: 1px solid rgba(255,255,255,0.1); padding-top:10px;">
-                    ${m.note || 'Pas de notes tactiques.'}
-                </div>
-            </div>
-        `).join('');
+                ${note ? `<div class="note">"${note}"</div>` : ''}
+            </div>`;
+        }).join('');
     }
 
     setInterval(() => {
