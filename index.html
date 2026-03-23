@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CENSECO 2026 - V27.3 STABLE</title>
+    <title>CENSECO 2026 - V27.4 FIXED</title>
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
@@ -37,30 +37,31 @@
         .quick-btn { background: #334155; border: none; color: white; padding: 5px 10px; border-radius: 3px; font-size: 0.75em; cursor: pointer; font-style: italic; }
         .btn-submit { background: var(--success); color: white; border: none; padding: 12px 30px; border-radius: 6px; font-weight: 900; cursor: pointer; }
 
-        /* --- P0 EMERGENCY ZONE --- */
-        .p0-emergency-zone { border: 4px solid var(--danger); background: #fff5f5; padding: 15px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(220, 38, 38, 0.1); }
-        .p0-header { color: var(--danger); font-weight: 900; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+        /* --- P0 ZONE --- */
+        .p0-emergency-zone { border: 4px solid var(--danger); background: #fff5f5; padding: 15px; border-radius: 12px; margin-bottom: 25px; }
+        .p0-header { color: var(--danger); font-weight: 900; margin-bottom: 10px; font-size: 1.1em; }
 
         /* --- BANDEAUX --- */
-        .day-sep { background: #000; color: var(--fids); padding: 12px 18px; font-weight: 900; border-radius: 8px; margin: 25px 0 10px 0; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .day-sep { background: #000; color: var(--fids); padding: 12px 18px; font-weight: 900; border-radius: 8px; margin: 25px 0 10px 0; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border: 2px solid var(--fids); }
 
         /* --- LIGNES --- */
         .mission-row { display: flex; align-items: center; background: white; margin-bottom: 8px; border-radius: 8px; overflow: hidden; border: 1px solid #cbd5e1; height: 95px; }
         .row-item { padding: 0 15px; border-right: 1px solid rgba(0,0,0,0.05); height: 100%; display: flex; flex-direction: column; justify-content: center; }
         .prio-tab-v { width: 45px; height: 100%; display: flex; align-items: center; justify-content: center; font-weight: 900; color: white; flex-shrink: 0; }
-        .mission-row.p0 { background: #ffff00; border: 2px solid #000; } .mission-row.p0 .prio-tab-v { background: #000; color: #ffff00; }
+        .mission-row.p0 { background: #ffff00; } .mission-row.p0 .prio-tab-v { background: #000; color: #ffff00; }
         .mission-row.p1 { background: #fff1f1; border-left: 5px solid var(--danger); } .mission-row.p1 .prio-tab-v { background: var(--danger); }
         .mission-row.p2 { border-left: 5px solid var(--accent); } .mission-row.p2 .prio-tab-v { background: var(--accent); }
         
         .badge-sect { background: #e2e8f0; color: #1e293b; padding: 2px 6px; border-radius: 4px; font-size: 0.7em; font-weight: 900; margin-right: 3px; border: 1px solid #cbd5e1; }
-        .status-pill { padding: 4px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 900; border: 1px solid #cbd5e1; }
+        .status-pill { padding: 4px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 900; border: 1px solid #cbd5e1; min-width: 40px; text-align: center; }
         .status-on { background: #dcfce7; color: #15803d; border-color: #15803d; }
+        .btn-action { border: none; background: #e2e8f0; padding: 8px 10px; border-radius: 4px; cursor: pointer; font-size: 0.7em; font-weight: 900; }
     </style>
 </head>
 <body>
 
 <header>
-    <div style="font-weight: 900;">CENSECO 2026 - <span style="color:var(--fids)">V27.3 STABLE MASTER</span></div>
+    <div style="font-weight: 900;">CENSECO 2026 - <span style="color:var(--fids)">V27.4 MASTER STABLE</span></div>
     <div id="clock">00:00:00</div>
 </header>
 
@@ -71,7 +72,7 @@
     <button class="nav-btn" onclick="showPage('retex', event)">📦 RETEX</button>
 </div>
 
-<div class="container" id="mainScroll">
+<div class="container">
     <div id="ops" class="page active">
         <div class="t-form">
             <input type="hidden" id="editTaskId">
@@ -82,7 +83,7 @@
                 <div id="nextPdgId" style="margin-left:auto; background:#000; color:var(--fids); padding:10px 20px; border-radius:5px; font-weight:900; border:1px solid var(--fids);">PDG-XXXXX</div>
             </div>
             <div class="t-row"><div class="t-col"><span class="t-label">Responsable</span><div class="btn-wrap" id="respGrid"><div class="btn-opt btn-resp">Chef Secours</div><div class="btn-opt btn-resp">Méd C PDG</div><div class="btn-opt btn-resp">Arlettaz</div><div class="btn-opt btn-resp">Chablais</div><div class="btn-opt btn-resp">Jüni</div></div></div></div>
-            <div class="t-row"><div class="t-col"><span class="t-label">Secteurs Concernés</span><div class="btn-wrap" id="sectGrid">
+            <div class="t-row"><div class="t-col"><span class="t-label">Secteurs</span><div class="btn-wrap" id="sectGrid">
                 <div class="btn-opt btn-sect">Med C PDG</div><div class="btn-opt btn-sect">S1 San</div><div class="btn-opt btn-sect">S3 San</div><div class="btn-opt btn-sect">S4 San</div><div class="btn-opt btn-sect">S6 San</div><div class="btn-opt btn-sect">S7 San</div><div class="btn-opt btn-sect">Héli</div><div class="btn-opt btn-sect">Off Li</div>
             </div></div></div>
             <div class="t-row">
@@ -91,7 +92,7 @@
             </div>
             <div class="t-row">
                 <div class="t-col" style="flex: 2.5;"><span class="t-label">Commentaires Tactiques</span><input type="text" id="tNote"></div>
-                <div class="t-col" style="flex: 1;"><span class="t-label">Suivi</span><div class="check-group" style="display:flex; gap:15px; padding:10px;"><label style="color:white; font-weight:900;"><input type="checkbox" id="checkGCS"> GCS</label><label style="color:white; font-weight:900;"><input type="checkbox" id="checkCPF"> CPF</label></div></div>
+                <div class="t-col" style="flex: 1;"><span class="t-label">Suivi</span><div class="check-group" style="display:flex; gap:15px; padding:10px;"><label style="color:white; font-weight:900; cursor:pointer;"><input type="checkbox" id="checkGCS"> GCS</label><label style="color:white; font-weight:900; cursor:pointer;"><input type="checkbox" id="checkCPF"> CPF</label></div></div>
                 <div style="display:flex; gap:10px; margin-left:auto;"><button onclick="resetForm()" class="btn-opt">EFFACER</button><button class="btn-submit" onclick="addMission()">VALIDER MISSION</button></div>
             </div>
         </div>
@@ -99,10 +100,7 @@
         <div id="timelineOps"></div>
     </div>
 
-    <div id="log" class="page">
-        <div id="p0ZoneLog"></div>
-        <div id="timelineLog"></div>
-    </div>
+    <div id="log" class="page"><div id="p0ZoneLog"></div><div id="timelineLog"></div></div>
 </div>
 
 <script>
@@ -129,7 +127,7 @@
     function addMission() {
         const idField = document.getElementById('editTaskId').value;
         const m = { id: idField ? parseInt(idField) : Date.now(), pdgId: idField ? db_missions.find(x=>x.id==idField).pdgId : "PDG-"+counter_pdg, title: document.getElementById('tTitle').value || "Mission", loc: document.getElementById('tLoc').value || "-", start: document.getElementById('tStart').value, end: document.getElementById('tEnd').value || "", priority: selectedPrio, resp: selectedResp, sectors: selectedSects, note: document.getElementById('tNote').value, gcs: document.getElementById('checkGCS').checked, cpf: document.getElementById('checkCPF').checked, status: 'active' };
-        if(idField) db_missions[db_missions.findIndex(x=>x.id==idField)] = m; else { db_missions.push(m); counter_pdg++; }
+        if(idField) { const idx = db_missions.findIndex(x=>x.id==idField); db_missions[idx] = m; } else { db_missions.push(m); counter_pdg++; }
         dbRef.set({ data: db_missions, counter: counter_pdg }).then(() => resetForm());
     }
 
@@ -142,31 +140,37 @@
     function renderTimeline(p0Id, timelineId) {
         const p0Cont = document.getElementById(p0Id); const lineCont = document.getElementById(timelineId);
         p0Cont.innerHTML = ''; lineCont.innerHTML = '';
-        const active = db_missions.filter(m => m.status === 'active');
+        const active = db_missions.filter(m => m && m.status === 'active');
 
-        // P0 ISOLÉES
+        // 1. ISOLATION P0 (TOUJOURS VISIBLES)
         const p0s = active.filter(m => m.priority === 'p0');
         if(p0s.length > 0) {
-            p0Cont.innerHTML = `<div class="p0-emergency-zone"><div class="p0-header">🚨 MISSIONS PRIORITAIRES P0</div></div>`;
+            p0Cont.innerHTML = `<div class="p0-emergency-zone"><div class="p0-header">🚨 MISSIONS P0 PRIORITAIRES</div></div>`;
             p0s.forEach(m => p0Cont.firstChild.innerHTML += createRowHtml(m));
         }
 
-        // CHRONOLOGIE
+        // 2. LOGIQUE CHRONO ROBUSTE
         const others = active.filter(m => m.priority !== 'p0');
         const days = {};
         others.forEach(m => {
-            let start = new Date(m.start.split('T')[0]);
-            let end = m.end ? new Date(m.end.split('T')[0]) : start;
-            let current = new Date(start);
-            // Sécurité : si la boucle bug, on force au moins le jour de début
-            if (isNaN(current.getTime())) current = new Date(); 
+            if (!m.start) return;
+            const startStr = m.start.split('T')[0];
+            const endStr = m.end ? m.end.split('T')[0] : startStr;
             
-            do {
+            // On s'assure d'avoir au moins le jour de début
+            let d1 = new Date(startStr);
+            let d2 = new Date(endStr);
+            if(isNaN(d1)) d1 = new Date();
+            if(isNaN(d2)) d2 = d1;
+
+            let current = new Date(d1);
+            while (current <= d2) {
                 let dStr = current.toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long'});
                 if(!days[dStr]) days[dStr] = [];
-                if(!days[dStr].find(x => x.id === m.id)) days[dStr].push(m);
+                days[dStr].push(m);
                 current.setDate(current.getDate() + 1);
-            } while (current <= end);
+                if (current.getDate() > 31 && d1.getMonth() === current.getMonth()) break; // Sécurité boucle infinie
+            }
         });
 
         Object.keys(days).sort((a,b) => new Date(a) - new Date(b)).forEach(dStr => {
@@ -180,16 +184,16 @@
         return `<div class="mission-row ${m.priority}">
             <div class="prio-tab-v">${m.priority.toUpperCase()}</div>
             <div class="row-item" style="width:130px;"><span class="info-label">TEMPS</span><span style="font-size:0.7em">D: ${m.start.replace('T',' ')}</span><span style="font-size:0.7em; opacity:0.5">F: ${m.end ? m.end.replace('T',' ') : '--'}</span></div>
-            <div class="row-item" style="width:100px;"><span class="info-label">ID</span><span style="color:var(--accent); font-weight:900">${m.pdgId}</span></div>
-            <div class="row-item" style="flex:2;"><b>${m.title}</b><div style="margin-top:4px;">${m.sectors.map(s => `<span class="badge-sect">${s}</span>`).join('')}</div></div>
-            <div class="row-item" style="width:120px;"><span class="info-label">RESP.</span><b>${m.resp}</b></div>
-            <div class="row-item" style="width:100px;"><div style="display:flex; gap:3px;"><span class="status-pill ${m.gcs?'status-on':''}">GCS</span><span class="status-pill ${m.cpf?'status-on':''}">CPF</span></div></div>
+            <div class="row-item" style="width:100px;"><span class="info-label">ID PDG</span><span style="color:var(--accent); font-weight:900">${m.pdgId}</span></div>
+            <div class="row-item" style="flex:2;"><b>${m.title}</b><br>${m.sectors ? m.sectors.map(s => `<span class="badge-sect">${s}</span>`).join('') : ''}</div>
+            <div class="row-item" style="width:120px;"><span class="info-label">RESP.</span><b>${m.resp || '-'}</b></div>
+            <div class="row-item" style="width:90px;"><div style="display:flex; gap:3px;"><span class="status-pill ${m.gcs?'status-on':''}">GCS</span><span class="status-pill ${m.cpf?'status-on':''}">CPF</span></div></div>
             <div class="row-item" style="border:none; flex-direction:row; gap:5px;"><button class="btn-action" onclick="editMission(${m.id})">EDIT</button><button class="btn-action" style="background:var(--success); color:white" onclick="archiveMission(${m.id})">FIN</button></div>
         </div>`;
     }
 
     function toggleDay(d) { if(collapsedDays.includes(d)) collapsedDays = collapsedDays.filter(x => x !== d); else collapsedDays.push(d); renderAll(); }
-    function archiveMission(id) { db_missions[db_missions.findIndex(x=>x.id==id)].status='archived'; dbRef.set({data:db_missions, counter:counter_pdg}); }
+    function archiveMission(id) { const idx = db_missions.findIndex(x=>x.id==id); db_missions[idx].status='archived'; dbRef.set({data:db_missions, counter:counter_pdg}); }
     function editMission(id) { const m = db_missions.find(x=>x.id==id); document.getElementById('editTaskId').value = m.id; document.getElementById('tTitle').value = m.title; document.getElementById('tLoc').value = m.loc; document.getElementById('tStart').value = m.start; document.getElementById('tEnd').value = m.end; showPage('ops', document.querySelectorAll('.nav-btn')[0]); }
     function resetForm() { document.getElementById('editTaskId').value=''; document.getElementById('tTitle').value=''; document.getElementById('tLoc').value=''; adjTime(0); document.querySelectorAll('.btn-opt').forEach(x=>x.classList.remove('active')); }
     function showPage(id, e) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active')); (e.target || e).classList.add('active'); }
