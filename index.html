@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CENSECO 2026 - V30.1 MASTER</title>
+    <title>CENSECO 2026 - V30.2 MASTER</title>
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
@@ -26,18 +26,19 @@
         .page { display: none; } .page.active { display: block; }
 
         /* --- FORMULAIRE --- */
-        .t-form { background: var(--dark); color: white; padding: 20px; border-radius: 8px; margin-bottom: 15px; width: 100%; box-sizing: border-box; }
-        .t-row { display: flex; gap: 15px; align-items: flex-end; margin-bottom: 12px; flex-wrap: wrap; }
-        .t-col { display: flex; flex-direction: column; gap: 5px; min-width: 150px; }
+        .t-form { background: var(--dark); color: white; padding: 20px; border-radius: 8px; margin-bottom: 15px; }
+        .t-row { display: flex; gap: 15px; align-items: flex-end; margin-bottom: 12px; }
+        .t-col { display: flex; flex-direction: column; gap: 5px; }
+        .t-label { font-size: 0.75em; font-weight: 900; color: #94a3b8; text-transform: uppercase; }
         .btn-wrap { display: flex; flex-wrap: wrap; gap: 5px; }
         .btn-opt { background: #1e293b; border: 1px solid #334155; color: #cbd5e1; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-size: 0.85em; font-weight: 700; }
         .btn-opt.active { background: var(--accent); color: white; border-color: #818cf8; }
-        input, select, textarea { background: #1e293b; border: 1px solid #334155; color: white; padding: 10px; border-radius: 4px; width: 100%; box-sizing: border-box; }
+        .btn-prio[data-val="p0"].active { background: #ffff00; color: #000; }
+        input, select { background: #1e293b; border: 1px solid #334155; color: white; padding: 10px; border-radius: 4px; width: 100%; box-sizing: border-box; }
         .btn-submit { background: var(--success); color: white; border: none; padding: 12px 30px; border-radius: 6px; font-weight: 900; cursor: pointer; }
 
-        /* --- LOG MISSIONS --- */
-        .mission-row-container { margin-bottom: 8px; width: 100%; }
-        .mission-row { display: flex; align-items: center; background: white; border-radius: 8px; border: 1px solid #cbd5e1; height: 95px; position: relative; overflow: hidden; }
+        /* --- MISSIONS / LOG --- */
+        .mission-row { display: flex; align-items: center; background: white; border-radius: 8px; border: 1px solid #cbd5e1; height: 95px; margin-bottom: 8px; overflow: hidden; position: relative; }
         .prio-tab-v { width: 45px; height: 100%; display: flex; align-items: center; justify-content: center; font-weight: 900; color: white; flex-shrink: 0; }
         .mission-row.p0 { background: #ffff00; } .mission-row.p0 .prio-tab-v { background: #000; color: #ffff00; }
         .mission-row.p1 { border-left: 5px solid var(--danger); } .mission-row.p1 .prio-tab-v { background: var(--danger); }
@@ -47,31 +48,31 @@
         .status-off { background: var(--danger); color: white; border-color: var(--danger); }
         .note-drawer { display: none; background: #fefce8; padding: 10px 45px; border: 1px solid #fde047; border-top: none; border-radius: 0 0 8px 8px; font-size: 0.85em; font-style: italic; color: #713f12; }
 
-        /* --- STATS --- */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .stat-card { background: white; padding: 20px; border-radius: 12px; text-align: center; border-top: 6px solid var(--accent); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .stat-num { font-size: 2.5em; font-weight: 900; display: block; }
-        .chart-box { background: white; padding: 20px; border-radius: 12px; border: 1px solid #cbd5e1; margin-bottom: 20px; }
-        .bar-track { background: #e2e8f0; height: 12px; border-radius: 6px; overflow: hidden; margin-top: 5px; }
-        .bar-fill { height: 100%; background: var(--accent); transition: width 0.6s; }
-
         /* --- PLANNING --- */
         .plan-wrap { overflow: auto; background: white; border: 1px solid #cbd5e1; border-radius: 8px; position: relative; max-height: 70vh; }
         .plan-grid { display: grid; grid-template-columns: var(--plan-lab) repeat(48, var(--plan-col)); width: max-content; }
         .plan-time-h { background: #000; color: var(--fids); font-weight: 900; font-size: 0.7em; text-align: center; padding: 12px 0; position: sticky; top: 0; z-index: 20; border-right: 1px solid #333; }
         .plan-post-l { background: #000; color: white; font-weight: 900; font-size: 0.7em; padding-left: 10px; display: flex; align-items: center; position: sticky; left: 0; z-index: 15; height: var(--plan-row); border-bottom: 1px solid #333; border-right: 2px solid var(--fids); }
         .plan-cell { height: var(--plan-row); border-bottom: 1px solid #eee; border-right: 1px solid #eee; position: relative; }
-        .s-blk { position: absolute; top: 4px; height: 36px; border-radius: 4px; display: flex; align-items: center; padding-left: 10px; font-weight: 900; font-size: 0.75em; color: white; z-index: 5; border: 1px solid rgba(255,255,255,0.2); box-shadow: 2px 0 5px rgba(0,0,0,0.2); }
+        .s-blk { position: absolute; top: 4px; height: 36px; border-radius: 4px; display: flex; align-items: center; padding-left: 10px; font-weight: 900; font-size: 0.75em; color: white; z-index: 5; border: 1px solid rgba(255,255,255,0.2); }
         .l-cng { grid-column: 2 / span 48; position: relative; background: #f8fafc; border-bottom: 1px solid #333; }
-        #nowL { position: absolute; top: 0; bottom: 0; width: 3px; background: var(--danger); z-index: 100; pointer-events: none; box-shadow: 0 0 10px var(--danger); }
+        #nowL { position: absolute; top: 0; bottom: 0; width: 3px; background: var(--danger); z-index: 100; pointer-events: none; }
 
+        /* --- STATS SEXY --- */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: white; padding: 20px; border-radius: 12px; text-align: center; border-top: 6px solid var(--accent); }
+        .stat-num { font-size: 2.8em; font-weight: 900; display: block; }
+        .chart-box { background: white; padding: 20px; border-radius: 12px; border: 1px solid #cbd5e1; margin-bottom: 20px; }
+        .bar-track { background: #e2e8f0; height: 12px; border-radius: 6px; overflow: hidden; margin-top: 5px; }
+        .bar-fill { height: 100%; background: var(--accent); transition: width 0.6s; }
+        
         #modEq { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1e293b; padding: 20px; border-radius: 12px; border: 2px solid var(--fids); z-index: 2000; width: 300px; color: white; }
     </style>
 </head>
 <body>
 
 <header>
-    <div style="font-weight: 900;">CENSECO 2026 - <span style="color:var(--fids)">V30.1 ULTIMATE</span></div>
+    <div style="font-weight: 900;">CENSECO 2026 - <span style="color:var(--fids)">V30.2 ULTIMATE</span></div>
     <div id="clock">00:00:00</div>
 </header>
 
@@ -102,8 +103,8 @@
                 <div class="btn-opt btn-sect">Med C PDG</div><div class="btn-opt btn-sect">S1 San</div><div class="btn-opt btn-sect">S3 San</div><div class="btn-opt btn-sect">S4 San</div><div class="btn-opt btn-sect">Héli</div>
             </div></div></div>
             <div class="t-row">
-                <div style="flex: 2; min-width:300px;"><span class="t-label">Désignation / Lieu</span><div style="display:flex; gap:10px;"><input type="text" id="tTitle" placeholder="Mission"><input type="text" id="tLoc" placeholder="Lieu"></div></div>
-                <div style="flex: 1; min-width:200px;"><span class="t-label">Notes Tactiques</span><input type="text" id="tNote"></div>
+                <div style="flex: 2;"><span class="t-label">Mission / Lieu</span><div style="display:flex; gap:10px;"><input type="text" id="tTitle" placeholder="Désignation"><input type="text" id="tLoc" placeholder="Lieu"></div></div>
+                <div style="flex: 1;"><span class="t-label">Notes Tactiques</span><input type="text" id="tNote" placeholder="..."></div>
             </div>
             <div class="t-row">
                 <div style="padding:10px; background:rgba(255,255,255,0.1); border-radius:5px;"><label><input type="checkbox" id="checkGCS"> GCS</label> <label style="margin-left:15px;"><input type="checkbox" id="checkCPF"> CPF</label></div>
@@ -116,56 +117,53 @@
     <div id="log" class="page"><div id="timelineLog"></div></div>
 
     <div id="stats" class="page">
-        <div class="stats-grid" id="statsMain"></div>
-        <div id="statsCharts"></div>
+        <div class="stats-grid">
+            <div class="stat-card"><span class="stat-num" id="stTotal">0</span>TOTAL</div>
+            <div class="stat-card" style="border-color:var(--danger)"><span class="stat-num" id="stUrgent" style="color:var(--danger)">0</span>URGENTS</div>
+            <div class="stat-card" style="border-color:var(--accent)"><span class="stat-num" id="stStd" style="color:var(--accent)">0</span>P2/P3</div>
+            <div class="stat-card" style="border-color:var(--success)"><span class="stat-num" id="stDuree" style="color:var(--success)">-</span>DURÉE MOY.</div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+            <div class="chart-box"><div class="t-label" style="color:#000">Secteurs</div><div id="secChart"></div></div>
+            <div class="chart-box"><div class="t-label" style="color:#000">Responsables</div><div id="respChart"></div></div>
+        </div>
     </div>
 
     <div id="plan" class="page">
-        <div class="t-form">
+        <div class="t-form" style="margin-bottom:10px;">
             <div class="t-row">
-                <div class="t-col"><label class="t-label">Personnel</label><select id="planSelP" style="background:#1e293b; color:white;"></select></div>
-                <div class="t-col"><label class="t-label">Poste</label><select id="planSelF" style="background:#1e293b; color:white;">
+                <div class="t-col"><label class="t-label">Personnel</label><select id="planSelP"></select></div>
+                <div class="t-col"><label class="t-label">Poste</label><select id="planSelF">
                     <option value="0">M C PDG</option><option value="1">C CenSeco</option><option value="2">Adj C CenSeco</option><option value="3">Rég 1</option><option value="4">Rég 2</option><option value="5">Rég piquet</option><option value="6">AIC C CenSeco</option><option value="7">AIC Rég 1</option><option value="8">AIC Rég 2</option><option value="9">Teneur d'affiche</option><option value="10">Rég Héli</option><option value="conge">🏖️ CONGÉ</option>
                 </select></div>
                 <div class="t-col"><label class="t-label">Début</label><input type="time" id="planSH" step="1800" value="08:00"></div>
                 <div class="t-col"><label class="t-label">Fin</label><input type="time" id="planEH" step="1800" value="12:00"></div>
-                <button class="btn-submit" onclick="addShift()">VALIDER GARDE</button>
-                <button class="btn-opt" onclick="openEq()">⚙️ ÉQUIPE</button>
+                <button class="btn-submit" onclick="addShift()">VALIDER</button>
+                <button class="btn-opt" onclick="openEq()">ÉQUIPE</button>
                 <button class="btn-opt" onclick="scPlanNow()" style="margin-left:auto">🎯 LIVE</button>
             </div>
         </div>
         <div class="plan-wrap" id="planScroll"><div class="plan-grid" id="planGridBody"></div></div>
     </div>
 
-    <div id="retex" class="page">
-        <div id="retexFormZone" style="display:none; background:white; padding:20px; border-radius:10px; margin-bottom:20px; border:2px solid var(--accent); color:black;">
-            <h3 id="retexTitle">Analyse</h3>
-            <textarea id="retPos" placeholder="Points Positifs" style="color:black; margin-bottom:10px;"></textarea>
-            <textarea id="retImp" placeholder="À Améliorer" style="color:black; margin-bottom:10px;"></textarea>
-            <textarea id="retCor" placeholder="Actions Correctives" style="color:black; margin-bottom:10px;"></textarea>
-            <button class="btn-submit" onclick="saveRetex()">FINALISER ET ARCHIVER</button>
-        </div>
-        <div id="retexList"></div>
-    </div>
+    <div id="retex" class="page"><div id="retexList"></div></div>
 </div>
 
 <div id="modEq">
-    <h4>Gestion d'Équipe</h4>
-    <input type="text" id="newMemberName" placeholder="Nom du membre">
-    <button class="btn-submit" onclick="addMember()" style="width:100%; margin-top:10px;">Ajouter</button>
-    <div id="teamList" style="margin-top:15px; max-height:200px; overflow:auto;"></div>
-    <button class="btn-opt" onclick="closeEq()" style="width:100%; margin-top:10px;">Fermer</button>
+    <h4>Équipe</h4>
+    <input type="text" id="newMemberName"><button class="btn-submit" onclick="addMember()" style="width:100%; margin-top:5px;">+</button>
+    <div id="teamList" style="margin-top:10px; max-height:150px; overflow:auto;"></div>
+    <button onclick="closeEq()" style="width:100%; margin-top:5px;">Fermer</button>
 </div>
 
 <script>
-    // FIREBASE
     const firebaseConfig = { apiKey: "AIzaSyA7zWuD_8yzhWARz-lSdHmDrcr7M9kHFHU", authDomain: "censeco-2026.firebaseapp.com", databaseURL: "https://censeco-2026-default-rtdb.europe-west1.firebasedatabase.app", projectId: "censeco-2026", storageBucket: "censeco-2026.firebasestorage.app", messagingSenderId: "1030152312862", appId: "1:1030152312862:web:9618132ec2bcfc7831b60f" };
     firebase.initializeApp(firebaseConfig);
     const dbRef = firebase.database().ref('missions_pdg');
     const planRef = firebase.database().ref('planning_pdg');
 
     let db_missions = []; let db_shifts = []; let counter_pdg = 1;
-    let team = ["Kohlprath", "Jüni", "Eichenberger", "Arlettaz", "Chablais", "Jaccoud", "Apothéloz", "Beaud", "Bize", "Mezger"];
+    let team = ["Kohlprath", "Jüni", "Eichenberger", "Arlettaz", "Chablais"];
     const postes_plan = ["M C PDG", "C CenSeco", "Adj C CenSeco", "Rég 1", "Rég 2", "Rég piquet", "AIC C CenSeco", "AIC Rég 1", "AIC Rég 2", "Teneur d'affiche", "Rég Héli"];
     const colors_plan = ["#4338ca", "#059669", "#d97706", "#7c3aed", "#be185d", "#0369a1", "#1e40af", "#065f46", "#92400e", "#6b21a8", "#b91c1c"];
     let selectedPrio = "p2", selectedResp = "", selectedSects = [];
@@ -175,53 +173,67 @@
             const d = snap.val();
             db_missions = d && d.data ? d.data : [];
             counter_pdg = d && d.counter ? d.counter : 1;
-            renderMissions(); renderStats(); renderRetex();
+            renderAllMissions();
         });
         planRef.on('value', snap => {
             const d = snap.val();
             if(d) { db_shifts = d.shifts || []; if(d.members) team = d.members; }
             initPlanGrid(); updateTeamUI();
         });
-        initInputs(); setInterval(updateClock, 1000); adjTime(0);
+        initFormEvents();
+        setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('fr-FR'); updateLiveLine(); }, 1000);
+        adjTime(0);
     };
 
-    function initInputs() {
+    function initFormEvents() {
         document.querySelectorAll('.btn-prio').forEach(b => b.onclick = () => { document.querySelectorAll('.btn-prio').forEach(x=>x.classList.remove('active')); b.classList.add('active'); selectedPrio = b.dataset.val; });
         document.querySelectorAll('.btn-resp').forEach(b => b.onclick = () => { document.querySelectorAll('.btn-resp').forEach(x=>x.classList.remove('active')); b.classList.add('active'); selectedResp = b.innerText; });
         document.querySelectorAll('.btn-sect').forEach(b => b.onclick = () => { b.classList.toggle('active'); selectedSects = Array.from(document.querySelectorAll('.btn-sect.active')).map(x=>x.innerText); });
     }
 
-    // --- RENDU MISSIONS ---
-    function renderMissions() {
-        const containers = [document.getElementById('timelineOps'), document.getElementById('timelineLog')];
-        containers.forEach(c => {
-            if(!c) return; c.innerHTML = '';
-            db_missions.filter(x => x.status === 'active').sort((a,b)=>new Date(a.start)-new Date(b.start)).forEach(m => {
-                const h = new Date(m.start).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
-                c.innerHTML += `
-                <div class="mission-row-container">
-                    <div class="mission-row ${m.priority}">
-                        <div class="prio-tab-v">${m.priority.toUpperCase()}</div>
-                        <div style="padding:10px; width:60px; font-weight:900;">${h}</div>
-                        <div style="padding:10px; width:80px; color:var(--accent); font-weight:900;">${m.pdgId}</div>
-                        <div style="flex:1; padding:10px;"><b>${m.title}</b><br><small>📍 ${m.loc} | ${m.sectors.join(', ')}</small></div>
-                        <div style="width:60px; display:flex; flex-direction:column; justify-content:center; align-items:center;">
-                            <div class="status-pill ${m.gcs?'status-on':'status-off'}">GCS</div>
-                            <div class="status-pill ${m.cpf?'status-on':'status-off'}">CPF</div>
-                        </div>
-                        <div style="padding:10px; display:flex; gap:5px;">
-                            <button class="btn-opt" onclick="toggleNote('note-${m.id}')">👁️</button>
-                            <button class="btn-opt" style="background:var(--danger); color:white;" onclick="archiveM(${m.id})">FIN</button>
-                        </div>
-                    </div>
-                    <div id="note-${m.id}" class="note-drawer">Note: ${m.note || '-'}</div>
-                </div>`;
-            });
-        });
-        document.getElementById('nextPdgId').innerText = "PDG-"+counter_pdg;
+    function renderAllMissions() {
+        renderMissionsList('timelineOps');
+        renderMissionsList('timelineLog');
+        renderStats();
+        renderRetex();
+        document.getElementById('nextPdgId').innerText = "PDG-" + counter_pdg;
     }
 
-    // --- PLANNING ---
+    function renderMissionsList(id) {
+        const cont = document.getElementById(id); if(!cont) return;
+        cont.innerHTML = '';
+        db_missions.filter(x => x.status === 'active').sort((a,b) => new Date(a.start) - new Date(b.start)).forEach(m => {
+            const h = new Date(m.start).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
+            cont.innerHTML += `
+            <div class="mission-row-container">
+                <div class="mission-row ${m.priority}">
+                    <div class="prio-tab-v">${m.priority.toUpperCase()}</div>
+                    <div style="width:60px; font-weight:900; padding:10px;">${h}</div>
+                    <div style="width:80px; color:var(--accent); font-weight:900;">${m.pdgId}</div>
+                    <div style="flex:1; padding:10px;"><b>${m.title}</b><br><small>📍 ${m.loc} | ${m.sectors.join(', ')}</small></div>
+                    <div style="width:60px; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+                        <div class="status-pill ${m.gcs?'status-on':'status-off'}">GCS</div>
+                        <div class="status-pill ${m.cpf?'status-on':'status-off'}">CPF</div>
+                    </div>
+                    <div style="padding:10px; display:flex; gap:5px;">
+                        <button class="btn-opt" onclick="toggleNote('note-${m.id}')">👁️</button>
+                        <button class="btn-opt" style="background:var(--danger); color:white;" onclick="archiveM(${m.id})">FIN</button>
+                    </div>
+                </div>
+                <div id="note-${m.id}" class="note-drawer">Note: ${m.note || '-'}</div>
+            </div>`;
+        });
+    }
+
+    function renderStats() {
+        const active = db_missions.filter(x => x.status === 'active');
+        document.getElementById('stTotal').innerText = active.length;
+        document.getElementById('stUrgent').innerText = active.filter(x => x.priority === 'p0' || x.priority === 'p1').length;
+        document.getElementById('stStd').innerText = active.filter(x => x.priority === 'p2' || x.priority === 'p3').length;
+        renderBarChart('secChart', getCounts(active, 'sectors'), 'var(--accent)');
+        renderBarChart('respChart', getCounts(active, 'resp'), 'var(--p3)');
+    }
+
     function initPlanGrid() {
         const g = document.getElementById('planGridBody'); if(!g) return;
         let h = `<div class="plan-time-h" style="position:sticky; left:0; z-index:21; border-right:2px solid var(--fids)">FONCTIONS</div>`;
@@ -244,14 +256,14 @@
                 if(!lvls[lv]) lvls[lv] = []; lvls[lv].push({s:s.sI, e:s.sI+s.dur});
                 const d = document.createElement('div'); d.className = 's-blk cng';
                 d.style.width = (s.dur*120-8)+"px"; d.style.left = (s.sI*120+4)+"px"; d.style.top = (lv*45+4)+"px";
-                d.innerHTML = `<span>🏖️ ${s.n}</span> <span onclick="delSh(${s.id})" style="cursor:pointer; margin-left:10px">×</span>`;
+                d.innerHTML = `<span>🏖️ ${s.n}</span><span onclick="delSh(${s.id})" style="cursor:pointer;margin-left:5px;">×</span>`;
                 cC.appendChild(d);
             } else {
                 const p = document.getElementById(`p-${s.pVal}-${s.sI}`);
                 if(p) {
                     const d = document.createElement('div'); d.className = 's-blk';
                     d.style.width = (s.dur*120-8)+"px"; d.style.left = "4px"; d.style.backgroundColor = colors_plan[s.pVal];
-                    d.innerHTML = `<span>${s.n}</span> <span onclick="delSh(${s.id})" style="cursor:pointer; margin-left:auto">×</span>`;
+                    d.innerHTML = `<span>${s.n}</span><span onclick="delSh(${s.id})" style="cursor:pointer;margin-left:auto;">×</span>`;
                     p.appendChild(d);
                 }
             }
@@ -259,33 +271,30 @@
         const mX = Math.max(lvls.length, 1); cC.style.height = (mX*45)+"px"; lC.style.height = (mX*45)+"px";
     }
 
-    // --- AUTRES FONCTIONS ---
     function addMission() {
         const m = { id: Date.now(), pdgId: "PDG-"+counter_pdg, title: document.getElementById('tTitle').value, loc: document.getElementById('tLoc').value, start: document.getElementById('tStart').value, end: document.getElementById('tEnd').value, priority: selectedPrio, resp: selectedResp, sectors: selectedSects, note: document.getElementById('tNote').value, gcs: document.getElementById('checkGCS').checked, cpf: document.getElementById('checkCPF').checked, status: 'active' };
         db_missions.push(m); counter_pdg++;
         dbRef.set({ data: db_missions, counter: counter_pdg }).then(resetForm);
     }
-    function archiveM(id) { if(confirm("Clôturer ?")) { const idx = db_missions.findIndex(x=>x.id==id); db_missions[idx].status='archived'; dbRef.set({data:db_missions, counter:counter_pdg}); } }
+
     function addShift() { const n=document.getElementById('planSelP').value, p=document.getElementById('planSelF').value, s=tToI(document.getElementById('planSH').value), e=tToI(document.getElementById('planEH').value); if(e<=s) return alert("Heure Fin < Début"); db_shifts.push({id:Date.now(), n, pVal:p, sI:s, dur:e-s}); planRef.update({shifts:db_shifts}); }
     function delSh(id) { db_shifts = db_shifts.filter(x=>x.id!==id); planRef.update({shifts:db_shifts}); }
-    function updateTeamUI() { document.getElementById('planSelP').innerHTML = team.map(m=>`<option>${m}</option>`).join(''); document.getElementById('teamList').innerHTML = team.map(m=>`<div style="display:flex; justify-content:space-between; margin-bottom:5px"><span>${m}</span><span onclick="delMem('${m}')" style="color:red; cursor:pointer">×</span></div>`).join(''); }
+    function tToI(t) { const [h,m] = t.split(':').map(Number); return h*2 + (m>=30?1:0); }
+    function archiveM(id) { if(confirm("Clôturer ?")) { const idx = db_missions.findIndex(x=>x.id==id); db_missions[idx].status='archived'; dbRef.set({data:db_missions, counter:counter_pdg}); } }
+    function getCounts(arr, key) { const c = {}; arr.forEach(m => { const v = m[key]; if(Array.isArray(v)) v.forEach(x => c[x] = (c[x]||0)+1); else if(v) c[v] = (c[v]||0)+1; }); return c; }
+    function renderBarChart(id, data, color) { const cont = document.getElementById(id); if(!cont) return; cont.innerHTML = ''; const max = Math.max(...Object.values(data), 1); Object.entries(data).sort((a,b)=>b[1]-a[1]).forEach(([l, v]) => { const p = (v/max)*100; cont.innerHTML += `<div style="margin-bottom:8px;"><div style="display:flex; justify-content:space-between; font-size:0.75em; font-weight:700;"><span>${l}</span><span>${v}</span></div><div class="bar-track"><div class="bar-fill" style="width:${p}%; background:${color}"></div></div></div>`; }); }
+    function showPage(id, e) { document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active')); if(e) (e.target || e).classList.add('active'); if(id==='plan') setTimeout(scPlanNow, 200); }
+    function resetForm() { document.getElementById('tTitle').value=''; document.getElementById('tLoc').value=''; document.getElementById('tNote').value=''; adjTime(0); document.querySelectorAll('.btn-opt, .btn-resp, .btn-sect').forEach(x=>x.classList.remove('active')); selectedSects=[]; selectedResp=""; }
+    function adjTime(m) { let n=new Date(); n.setMinutes(n.getMinutes()-n.getTimezoneOffset()); document.getElementById('tStart').value=n.toISOString().slice(0,16); }
+    function toggleNote(id) { const e=document.getElementById(id); e.style.display=e.style.display==='block'?'none':'block'; }
+    function updateTeamUI() { document.getElementById('planSelP').innerHTML = team.map(m=>`<option>${m}</option>`).join(''); document.getElementById('teamList').innerHTML = team.map(m=>`<div style="display:flex; justify-content:space-between; color:white; margin-bottom:5px"><span>${m}</span><span onclick="delMem('${m}')" style="color:red; cursor:pointer">×</span></div>`).join(''); }
     function addMember() { const n=document.getElementById('newMemberName').value; if(n){ team.push(n); planRef.update({members:team}); document.getElementById('newMemberName').value=''; }}
     function delMem(n) { team=team.filter(x=>x!==n); planRef.update({members:team}); }
-    function showPage(id, e) { document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active')); if(e) (e.target || e).classList.add('active'); if(id==='plan') setTimeout(scPlanNow, 200); }
-    function adjTime(m) { let n=new Date(); n.setMinutes(n.getMinutes()-n.getTimezoneOffset()); document.getElementById('tStart').value=n.toISOString().slice(0,16); }
-    function resetForm() { document.getElementById('tTitle').value=''; document.getElementById('tLoc').value=''; document.getElementById('tNote').value=''; adjTime(0); document.querySelectorAll('.btn-opt, .btn-resp, .btn-sect').forEach(x=>x.classList.remove('active')); }
-    function updateClock() { const n=new Date(); document.getElementById('clock').innerText=n.toLocaleTimeString('fr-FR'); const line=document.getElementById('nowL'); if(line){ line.style.left=(180 + ((n.getHours()*60)+n.getMinutes())*4)+"px"; }}
-    function toggleNote(id) { const e=document.getElementById(id); e.style.display=e.style.display==='block'?'none':'block'; }
-    function scPlanNow() { const n=new Date(); const p=180+(((n.getHours()*60)+n.getMinutes())*4); document.getElementById('planScroll').scrollLeft=p-240; }
     function openEq() { document.getElementById('modEq').style.display='block'; }
     function closeEq() { document.getElementById('modEq').style.display='none'; }
-    function renderStats() { /* Simplifié : Intégrer les barres si nécessaire */ }
-    function renderRetex() { 
-        const cont = document.getElementById('retexList'); if(!cont) return; cont.innerHTML = '';
-        db_missions.filter(x=>x.status==='archived').forEach(m => {
-            cont.innerHTML += `<div class="mission-row" style="background:#fff; padding:15px; margin-bottom:10px; color:black;"><b>${m.pdgId}</b> - ${m.title} <button class="btn-submit" onclick="alert('Module PDF prêt')">DÉTAILS</button></div>`;
-        });
-    }
+    function scPlanNow() { const n = new Date(); const p = 180 + (((n.getHours()*60)+n.getMinutes()) * 4); document.getElementById('planScroll').scrollLeft = p - 240; }
+    function updateLiveLine() { const n = new Date(); const line = document.getElementById('nowL'); if(line){ line.style.left = (180 + ((n.getHours()*60)+n.getMinutes())*4) + "px"; }}
+    function renderRetex() { const cont = document.getElementById('retexList'); if(!cont) return; cont.innerHTML = '<h3 style="color:#000">Archives à analyser</h3>'; db_missions.filter(x=>x.status==='archived').forEach(m => { cont.innerHTML += `<div class="mission-row" style="padding:15px; color:#000;"><b>${m.pdgId}</b> - ${m.title} <button class="btn-submit" style="margin-left:auto">DÉTAILS</button></div>`; }); }
 </script>
 </body>
 </html>
