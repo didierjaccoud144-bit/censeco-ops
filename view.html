@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CENSECO 2026 - SMART MONITOR</title>
+    <title>CENSECO 2026 - MONITOR V3.3</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <style>
@@ -15,16 +15,16 @@
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 10px; box-sizing: border-box; }
         
         header { border-bottom: 3px solid var(--fids); padding: 10px 0; margin-bottom: 20px; text-align: center; }
-        .clock { font-family: monospace; font-size: 2.5em; font-weight: 900; color: var(--fids); margin-top: 5px; line-height: 1; }
+        .clock { font-family: monospace; font-size: 2.8em; font-weight: 900; color: var(--fids); line-height: 1; }
         
-        /* BANDEAU DATE DU MOMENT */
-        .current-date-full { 
-            font-size: 1em; 
+        /* BANDEAU DATE SEULE */
+        .current-date-text { 
+            font-size: 1.1em; 
             color: white; 
-            opacity: 0.9; 
-            margin-top: 10px; 
+            opacity: 0.8; 
+            margin-top: 8px; 
             font-weight: 600;
-            text-transform: none;
+            letter-spacing: 0.5px;
         }
 
         .grid-monitor { display: flex; flex-direction: column; gap: 20px; }
@@ -50,6 +50,7 @@
         .card-body { padding: 25px; flex: 1; display: flex; flex-direction: column; justify-content: space-around; text-align: center; }
         .mission-title { font-size: 3em; font-weight: 900; line-height: 1.1; margin: 10px 0; color: var(--fids); text-transform: uppercase; }
         
+        /* CORRECTION P0 TEXTE NOIR */
         .card.p0 .card-body { background: var(--p0); color: #000; }
         .card.p0 .mission-title, .card.p0 .time-box, .card.p0 .loc-box { color: #000; }
         .card.p0 .loc-box { border-color: #000; background: rgba(0,0,0,0.05); }
@@ -70,8 +71,8 @@
 
 <header>
     <div class="clock" id="clock">00:00:00</div>
-    <div id="fullDateDisplay" class="current-date-full">Initialisation de la date...</div>
-    <div id="count" style="font-weight: 800; color: var(--accent); margin-top: 15px; font-size: 0.8em; opacity: 0.6;">CHARGEMENT...</div>
+    <div id="dateDisplay" class="current-date-text">Chargement de la date...</div>
+    <div id="count" style="font-weight: 800; color: var(--accent); margin-top: 15px; font-size: 0.8em; opacity: 0.5; text-transform: uppercase;">Sync Firebase...</div>
 </header>
 
 <div id="monitorBody" class="grid-monitor"></div>
@@ -81,17 +82,14 @@
     firebase.initializeApp(firebaseConfig);
     const dbRef = firebase.database().ref('missions_pdg');
 
-    function updateClock() {
+    function updateHeader() {
         const now = new Date();
-        // Mise à jour de l'horloge FIDS
+        // Horloge FIDS
         document.getElementById('clock').innerText = now.toLocaleTimeString('fr-FR');
-        
-        // Mise à jour de la phrase complète
+        // Date textuelle pure
         const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
         const dateStr = now.toLocaleDateString('fr-FR', options);
-        const timeStr = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }).replace(':', 'h');
-        
-        document.getElementById('fullDateDisplay').innerText = `Nous sommes le ${dateStr}, il est ${timeStr}`;
+        document.getElementById('dateDisplay').innerText = `Nous sommes le ${dateStr}`;
     }
 
     dbRef.on('value', snap => {
@@ -114,6 +112,7 @@
             return endLimit > now;
         });
 
+        // Tri chronologique correct (Date + Heure)
         displayList.sort((a, b) => new Date(a.start) - new Date(b.start));
 
         document.getElementById('count').innerText = displayList.length + " MISSION(S) ACTIVE(S)";
@@ -146,7 +145,7 @@
                 <div class="card-header">${prioLabel}</div>
                 <div class="card-body">
                     <div class="time-box">
-                        <div style="font-size:0.6em; opacity:0.8;">⏱️ ${dateTitle.split(' ')[0]}</div>
+                        <div style="font-size:0.6em; opacity:0.8; text-transform:uppercase; font-weight:800;">⏱️ ${dateTitle.split(' ')[0]}</div>
                         <div>DÉBUT : ${hS}</div>
                         ${hE ? `<div style="color:var(--danger); font-size:0.8em; font-weight:900;">FIN EST. : ${hE}</div>` : ''}
                     </div>
@@ -168,9 +167,9 @@
         body.innerHTML = html;
     }
 
-    // Refresh toutes les secondes pour l'horloge
-    setInterval(updateClock, 1000);
-    // Refresh auto des missions toutes les minutes (pour le filtre passé)
+    setInterval(updateHeader, 1000);
+    
+    // Auto-refresh des missions pour le filtre temporel (chaque min)
     setInterval(() => {
         dbRef.once('value', snap => {
             const d = snap.val();
@@ -178,7 +177,7 @@
         });
     }, 60000);
 
-    updateClock();
+    updateHeader();
 </script>
 </body>
 </html>
