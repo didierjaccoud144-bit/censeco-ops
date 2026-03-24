@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CENSECO 2026 - MOBILE MONITOR V3.0</title>
+    <title>CENSECO 2026 - SMART MONITOR</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <style>
@@ -19,40 +19,39 @@
         
         .grid-monitor { display: flex; flex-direction: column; gap: 20px; }
         
+        /* BANDEAU DE DATE */
+        .date-separator { 
+            background: #1e293b; color: var(--fids); padding: 10px; 
+            font-weight: 900; text-align: center; text-transform: uppercase; 
+            border-radius: 10px; margin: 10px 0; border: 1px solid var(--fids);
+            letter-spacing: 2px; font-size: 1.1em;
+        }
+
         .card { 
-            background: #1e293b; 
-            border-radius: 20px; 
-            overflow: hidden; 
-            display: flex; 
-            flex-direction: column;
-            min-height: 500px;
-            border: 2px solid rgba(255,255,255,0.1);
+            background: #1e293b; border-radius: 20px; overflow: hidden; 
+            display: flex; flex-direction: column; min-height: 500px; 
+            border: 2px solid rgba(255,255,255,0.1); 
         }
         
         .card-header { padding: 15px; font-weight: 900; text-align: center; text-transform: uppercase; font-size: 1.2em; background: var(--p2); color: white; }
-        
         .card.p0 .card-header { background: #000; color: var(--p0); animation: pulse 1.5s infinite; }
         .card.p1 .card-header { background: var(--p1); }
         .card.log .card-header { background: var(--log); color: white; }
 
         .card-body { padding: 25px; flex: 1; display: flex; flex-direction: column; justify-content: space-around; text-align: center; }
-
-        .mission-title { font-size: 3em; font-weight: 900; line-height: 1; margin: 0; color: var(--fids); text-transform: uppercase; }
-        .loc-box { font-size: 2.2em; font-weight: 800; color: #fff; background: rgba(56, 189, 248, 0.2); padding: 15px; border-radius: 12px; margin: 20px 0; border: 1px solid var(--accent); }
+        .mission-title { font-size: 3em; font-weight: 900; line-height: 1.1; margin: 10px 0; color: var(--fids); text-transform: uppercase; }
         
-        /* === CORRECTION P0 : TOUT LE TEXTE EN NOIR SUR FOND JAUNE === */
-        .card.p0 .card-body { background: var(--p0); color: #000; } /* Forcer le texte en noir */
-        .card.p0 .mission-title { color: #000; }
-        .card.p0 .loc-box { color: #000; background: rgba(0,0,0,0.1); border-color: #000; }
-        .card.p0 .time-box { color: #000; } /* Forcer l'horaire en noir */
+        /* CORRECTION P0 TEXTE NOIR */
+        .card.p0 .card-body { background: var(--p0); color: #000; }
+        .card.p0 .mission-title, .card.p0 .time-box, .card.p0 .loc-box { color: #000; }
+        .card.p0 .loc-box { border-color: #000; background: rgba(0,0,0,0.05); }
 
-        .time-box { font-size: 1.8em; font-weight: 900; color: var(--accent); margin: 15px 0; display: flex; flex-direction: column; gap: 5px; }
-
-        .meta-info { font-size: 1.3em; opacity: 0.9; margin-bottom: 20px; }
-        .note { font-style: italic; font-size: 1.1em; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; margin-top: auto; }
-
+        .loc-box { font-size: 2.2em; font-weight: 800; color: #fff; background: rgba(56, 189, 248, 0.2); padding: 15px; border-radius: 12px; margin: 15px 0; border: 1px solid var(--accent); }
+        .time-box { font-size: 1.8em; font-weight: 900; color: var(--accent); margin: 10px 0; }
+        .meta-info { font-size: 1.3em; opacity: 0.9; margin-bottom: 10px; }
+        
         .status-bar { display: flex; justify-content: center; gap: 20px; padding: 20px; background: rgba(0,0,0,0.4); }
-        .badge { padding: 10px 20px; border-radius: 30px; font-weight: 900; font-size: 1em; }
+        .badge { padding: 10px 20px; border-radius: 30px; font-weight: 900; }
         .badge.on { background: #15803d; color: white; }
         .badge.off { background: #475569; opacity: 0.5; }
 
@@ -62,12 +61,11 @@
 <body>
 
 <header>
-    <div style="font-weight: 900; letter-spacing: 1px; opacity: 0.7;">PDG 2026 - MONITOR</div>
     <div class="clock" id="clock">00:00:00</div>
     <div id="count" style="font-weight: 800; color: var(--accent); margin-top: 5px;">CHARGEMENT...</div>
 </header>
 
-<div class="grid-monitor" id="monitorBody"></div>
+<div id="monitorBody" class="grid-monitor"></div>
 
 <script>
     const firebaseConfig = { apiKey: "AIzaSyA7zWuD_8yzhWARz-lSdHmDrcr7M9kHFHU", authDomain: "censeco-2026.firebaseapp.com", databaseURL: "https://censeco-2026-default-rtdb.europe-west1.firebasedatabase.app", projectId: "censeco-2026", storageBucket: "censeco-2026.firebasestorage.app", messagingSenderId: "1030152312862", appId: "1:1030152312862:web:9618132ec2bcfc7831b60f" };
@@ -76,36 +74,60 @@
 
     dbRef.on('value', snap => {
         const data = snap.val();
-        let missions = (data && data.data) ? data.data : [];
+        const missions = (data && data.data) ? data.data : [];
         renderMonitor(missions);
     });
 
     function renderMonitor(missions) {
         const body = document.getElementById('monitorBody');
-        const activeMissions = missions.filter(m => m.status === 'active' || m.status === 'En cours');
-        document.getElementById('count').innerText = activeMissions.length + " MISSION(S) EN COURS";
+        const now = new Date();
+
+        // 1. FILTRE : Uniquement les missions "actives" dont l'heure de fin n'est pas passée (+15min)
+        const displayList = missions.filter(m => {
+            const isActive = (m.status === 'active' || m.status === 'En cours');
+            if (!isActive) return false;
+            if (!m.end) return true; // Toujours afficher si pas de fin prévue
+            
+            const endLimit = new Date(m.end);
+            endLimit.setMinutes(endLimit.getMinutes() + 15);
+            return endLimit > now; // On garde si la limite est dans le futur
+        });
+
+        // 2. TRI : Chronologique pur (Date + Heure)
+        displayList.sort((a, b) => new Date(a.start) - new Date(b.start));
+
+        document.getElementById('count').innerText = displayList.length + " MISSION(S) ACTUELLE(S)";
         
-        if (activeMissions.length === 0) {
-            body.innerHTML = '<div style="text-align:center; padding:100px; opacity:0.2; font-weight:900;">VEILLE OPÉRATIONNELLE</div>';
+        if (displayList.length === 0) {
+            body.innerHTML = '<div style="text-align:center; padding-top:100px; opacity:0.3; font-weight:900; font-size:1.5em;">AUCUNE MISSION ACTUELLE</div>';
             return;
         }
 
-        body.innerHTML = activeMissions.map(m => {
-            const dateObj = m.start ? new Date(m.start) : new Date();
-            const hS = dateObj.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
-            const hE = m.end ? new Date(m.end).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '';
-            const dayStr = dateObj.toLocaleDateString('fr-FR', { weekday: 'long' });
+        let html = '';
+        let lastDateHeader = '';
+
+        displayList.forEach(m => {
+            const startObj = new Date(m.start);
+            const dateTitle = startObj.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase();
+            const hS = startObj.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+            const hE = m.end ? new Date(m.end).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '';
+
+            // Affichage du bandeau de jour si changement de date
+            if (dateTitle !== lastDateHeader) {
+                html += `<div class="date-separator">🗓️ ${dateTitle}</div>`;
+                lastDateHeader = dateTitle;
+            }
 
             let prioLabel = "Mission #" + m.pdgId;
             if (m.priority === 'p0') prioLabel = '🚨 PRIORITÉ ABSOLUE';
             if (m.priority === 'log') prioLabel = '⚪ MISSION LOGISTIQUE';
 
-            return `
+            html += `
             <div class="card ${m.priority}">
                 <div class="card-header">${prioLabel}</div>
                 <div class="card-body">
                     <div class="time-box">
-                        <div style="font-size:0.6em; text-transform:uppercase; font-weight:800;">⏱️ ${dayStr}</div>
+                        <div style="font-size:0.6em; opacity:0.8;">⏱️ ${dateTitle.split(' ')[0]}</div>
                         <div>DÉBUT : ${hS}</div>
                         ${hE ? `<div style="color:var(--danger); font-size:0.8em; font-weight:900;">FIN EST. : ${hE}</div>` : ''}
                     </div>
@@ -115,15 +137,25 @@
                         <b>Secteurs :</b> ${m.sectors || 'Tous'}<br>
                         <b>Resp :</b> ${m.resp}
                     </div>
-                    ${m.note ? `<div class="note">"${m.note}"</div>` : ''}
+                    ${m.note ? `<div style="font-style:italic; background:rgba(0,0,0,0.2); padding:10px; border-radius:10px; font-size:0.9em;">"${m.note}"</div>` : ''}
                 </div>
                 <div class="status-bar">
                     <div class="badge ${m.gcs ? 'on' : 'off'}">GCS</div>
                     <div class="badge ${m.cpf ? 'on' : 'off'}">CPF</div>
                 </div>
             </div>`;
-        }).join('');
+        });
+
+        body.innerHTML = html;
     }
+
+    // Rafraîchir l'affichage toutes les minutes pour le filtre temporel automatique
+    setInterval(() => {
+        dbRef.once('value', snap => {
+            const d = snap.val();
+            if(d && d.data) renderMonitor(d.data);
+        });
+    }, 60000);
 
     setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('fr-FR'); }, 1000);
 </script>
