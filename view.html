@@ -15,11 +15,20 @@
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 10px; box-sizing: border-box; }
         
         header { border-bottom: 3px solid var(--fids); padding: 10px 0; margin-bottom: 20px; text-align: center; }
-        .clock { font-family: monospace; font-size: 2.5em; font-weight: 900; color: var(--fids); margin-top: 5px; }
+        .clock { font-family: monospace; font-size: 2.5em; font-weight: 900; color: var(--fids); margin-top: 5px; line-height: 1; }
         
+        /* BANDEAU DATE DU MOMENT */
+        .current-date-full { 
+            font-size: 1em; 
+            color: white; 
+            opacity: 0.9; 
+            margin-top: 10px; 
+            font-weight: 600;
+            text-transform: none;
+        }
+
         .grid-monitor { display: flex; flex-direction: column; gap: 20px; }
         
-        /* BANDEAU DE DATE */
         .date-separator { 
             background: #1e293b; color: var(--fids); padding: 10px; 
             font-weight: 900; text-align: center; text-transform: uppercase; 
@@ -41,7 +50,6 @@
         .card-body { padding: 25px; flex: 1; display: flex; flex-direction: column; justify-content: space-around; text-align: center; }
         .mission-title { font-size: 3em; font-weight: 900; line-height: 1.1; margin: 10px 0; color: var(--fids); text-transform: uppercase; }
         
-        /* CORRECTION P0 TEXTE NOIR */
         .card.p0 .card-body { background: var(--p0); color: #000; }
         .card.p0 .mission-title, .card.p0 .time-box, .card.p0 .loc-box { color: #000; }
         .card.p0 .loc-box { border-color: #000; background: rgba(0,0,0,0.05); }
@@ -62,7 +70,8 @@
 
 <header>
     <div class="clock" id="clock">00:00:00</div>
-    <div id="count" style="font-weight: 800; color: var(--accent); margin-top: 5px;">CHARGEMENT...</div>
+    <div id="fullDateDisplay" class="current-date-full">Initialisation de la date...</div>
+    <div id="count" style="font-weight: 800; color: var(--accent); margin-top: 15px; font-size: 0.8em; opacity: 0.6;">CHARGEMENT...</div>
 </header>
 
 <div id="monitorBody" class="grid-monitor"></div>
@@ -71,6 +80,19 @@
     const firebaseConfig = { apiKey: "AIzaSyA7zWuD_8yzhWARz-lSdHmDrcr7M9kHFHU", authDomain: "censeco-2026.firebaseapp.com", databaseURL: "https://censeco-2026-default-rtdb.europe-west1.firebasedatabase.app", projectId: "censeco-2026", storageBucket: "censeco-2026.firebasestorage.app", messagingSenderId: "1030152312862", appId: "1:1030152312862:web:9618132ec2bcfc7831b60f" };
     firebase.initializeApp(firebaseConfig);
     const dbRef = firebase.database().ref('missions_pdg');
+
+    function updateClock() {
+        const now = new Date();
+        // Mise à jour de l'horloge FIDS
+        document.getElementById('clock').innerText = now.toLocaleTimeString('fr-FR');
+        
+        // Mise à jour de la phrase complète
+        const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+        const dateStr = now.toLocaleDateString('fr-FR', options);
+        const timeStr = now.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }).replace(':', 'h');
+        
+        document.getElementById('fullDateDisplay').innerText = `Nous sommes le ${dateStr}, il est ${timeStr}`;
+    }
 
     dbRef.on('value', snap => {
         const data = snap.val();
@@ -82,21 +104,19 @@
         const body = document.getElementById('monitorBody');
         const now = new Date();
 
-        // 1. FILTRE : Uniquement les missions "actives" dont l'heure de fin n'est pas passée (+15min)
         const displayList = missions.filter(m => {
             const isActive = (m.status === 'active' || m.status === 'En cours');
             if (!isActive) return false;
-            if (!m.end) return true; // Toujours afficher si pas de fin prévue
+            if (!m.end) return true;
             
             const endLimit = new Date(m.end);
             endLimit.setMinutes(endLimit.getMinutes() + 15);
-            return endLimit > now; // On garde si la limite est dans le futur
+            return endLimit > now;
         });
 
-        // 2. TRI : Chronologique pur (Date + Heure)
         displayList.sort((a, b) => new Date(a.start) - new Date(b.start));
 
-        document.getElementById('count').innerText = displayList.length + " MISSION(S) ACTUELLE(S)";
+        document.getElementById('count').innerText = displayList.length + " MISSION(S) ACTIVE(S)";
         
         if (displayList.length === 0) {
             body.innerHTML = '<div style="text-align:center; padding-top:100px; opacity:0.3; font-weight:900; font-size:1.5em;">AUCUNE MISSION ACTUELLE</div>';
@@ -112,7 +132,6 @@
             const hS = startObj.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
             const hE = m.end ? new Date(m.end).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '';
 
-            // Affichage du bandeau de jour si changement de date
             if (dateTitle !== lastDateHeader) {
                 html += `<div class="date-separator">🗓️ ${dateTitle}</div>`;
                 lastDateHeader = dateTitle;
@@ -149,7 +168,9 @@
         body.innerHTML = html;
     }
 
-    // Rafraîchir l'affichage toutes les minutes pour le filtre temporel automatique
+    // Refresh toutes les secondes pour l'horloge
+    setInterval(updateClock, 1000);
+    // Refresh auto des missions toutes les minutes (pour le filtre passé)
     setInterval(() => {
         dbRef.once('value', snap => {
             const d = snap.val();
@@ -157,7 +178,7 @@
         });
     }, 60000);
 
-    setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('fr-FR'); }, 1000);
+    updateClock();
 </script>
 </body>
 </html>
