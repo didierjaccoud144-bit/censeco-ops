@@ -3,73 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CENSECO 2026 - MOBILE MONITOR</title>
+    <title>CENSECO 2026 - CHRONO MONITOR</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <style>
         :root { 
             --bg: #020617; --fids: #ffcc00; --accent: #38bdf8; 
-            --p0: #ffff00; --p1: #ef4444; --p2: #3b82f6;
-            --log: #4b5320; /* Vert Olive pour LOG */
+            --p0: #ffff00; --p1: #ef4444; --p2: #3b82f6; --log: #4b5320;
         }
         
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 10px; box-sizing: border-box; }
         
-        header { border-bottom: 3px solid var(--fids); padding: 10px 0; margin-bottom: 20px; text-align: center; }
-        .clock { font-family: monospace; font-size: 2.5em; font-weight: 900; color: var(--fids); margin-top: 5px; }
+        header { border-bottom: 3px solid var(--fids); padding: 10px 0; margin-bottom: 10px; text-align: center; }
+        .clock { font-family: monospace; font-size: 2.2em; font-weight: 900; color: var(--fids); }
         
+        /* BANDEAU DE DATE */
+        .date-separator { 
+            background: var(--fids); 
+            color: #000; 
+            padding: 8px; 
+            font-weight: 900; 
+            text-align: center; 
+            text-transform: uppercase; 
+            border-radius: 8px; 
+            margin: 20px 0 10px 0;
+            letter-spacing: 2px;
+            font-size: 1.1em;
+        }
+
         .grid-monitor { display: flex; flex-direction: column; gap: 20px; }
         
         .card { 
-            background: #1e293b; 
-            border-radius: 20px; 
-            overflow: hidden; 
-            display: flex; 
-            flex-direction: column;
-            min-height: 500px;
-            border: 2px solid rgba(255,255,255,0.1);
+            background: #1e293b; border-radius: 20px; overflow: hidden; 
+            display: flex; flex-direction: column; min-height: 480px; 
+            border: 2px solid rgba(255,255,255,0.1); 
         }
         
         .card-header { padding: 15px; font-weight: 900; text-align: center; text-transform: uppercase; font-size: 1.2em; background: var(--p2); color: white; }
-        
-        /* GESTION COULEURS PRIORITÉS (Correction Log) */
         .card.p0 .card-header { background: #000; color: var(--p0); animation: pulse 1.5s infinite; }
         .card.p1 .card-header { background: var(--p1); }
-        .card.log .card-header { background: var(--log); color: white; } /* LOG = VERT OLIVE */
+        .card.log .card-header { background: var(--log); color: white; }
 
         .card-body { padding: 25px; flex: 1; display: flex; flex-direction: column; justify-content: space-around; text-align: center; }
-
-        .mission-title { font-size: 3em; font-weight: 900; line-height: 1; margin: 0; color: var(--fids); text-transform: uppercase; }
-        .loc-box { font-size: 2.2em; font-weight: 800; color: #fff; background: rgba(56, 189, 248, 0.2); padding: 15px; border-radius: 12px; margin: 20px 0; border: 1px solid var(--accent); }
+        .mission-title { font-size: 2.8em; font-weight: 900; line-height: 1; margin: 0; color: var(--fids); text-transform: uppercase; }
+        .loc-box { font-size: 2em; font-weight: 800; color: #fff; background: rgba(56, 189, 248, 0.1); padding: 15px; border-radius: 12px; margin: 15px 0; border: 1px solid var(--accent); }
         
-        .card.p0 .mission-title { color: #000; }
-        .card.p0 .loc-box { color: #000; background: rgba(0,0,0,0.1); border-color: #000; }
+        .card.p0 .mission-title, .card.p0 .loc-box { color: #000; }
         .card.p0 .card-body { background: var(--p0); }
 
-        .time-box { font-size: 1.8em; font-weight: 900; color: var(--accent); margin: 15px 0; display: flex; flex-direction: column; gap: 5px; }
+        .time-box { font-size: 1.6em; font-weight: 900; color: var(--accent); margin-bottom: 10px; }
         .card.p0 .time-box { color: #000; }
 
-        .meta-info { font-size: 1.3em; opacity: 0.9; margin-bottom: 20px; }
-        .note { font-style: italic; font-size: 1.1em; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; margin-top: auto; }
-
-        .status-bar { display: flex; justify-content: center; gap: 20px; padding: 20px; background: rgba(0,0,0,0.4); }
-        .badge { padding: 10px 20px; border-radius: 30px; font-weight: 900; font-size: 1em; }
+        .meta-info { font-size: 1.2em; opacity: 0.9; }
+        .status-bar { display: flex; justify-content: center; gap: 20px; padding: 15px; background: rgba(0,0,0,0.4); }
+        .badge { padding: 8px 18px; border-radius: 30px; font-weight: 900; }
         .badge.on { background: #15803d; color: white; }
-        .badge.off { background: #475569; opacity: 0.5; }
+        .badge.off { background: #475569; opacity: 0.4; }
 
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
-        .empty { text-align: center; opacity: 0.2; font-size: 2em; margin-top: 100px; font-weight: 900; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
     </style>
 </head>
 <body>
 
 <header>
-    <div style="font-weight: 900; letter-spacing: 1px; opacity: 0.7;">PDG 2026 - MONITOR</div>
+    <div id="count" style="font-weight: 900; text-transform: uppercase; opacity: 0.7; font-size: 0.8em;">Initialisation...</div>
     <div class="clock" id="clock">00:00:00</div>
-    <div id="count" style="font-weight: 800; color: var(--accent); margin-top: 5px;">CHARGEMENT...</div>
 </header>
 
-<div class="grid-monitor" id="monitorBody"></div>
+<div id="monitorBody"></div>
 
 <script>
     const firebaseConfig = { apiKey: "AIzaSyA7zWuD_8yzhWARz-lSdHmDrcr7M9kHFHU", authDomain: "censeco-2026.firebaseapp.com", databaseURL: "https://censeco-2026-default-rtdb.europe-west1.firebasedatabase.app", projectId: "censeco-2026", storageBucket: "censeco-2026.firebasestorage.app", messagingSenderId: "1030152312862", appId: "1:1030152312862:web:9618132ec2bcfc7831b60f" };
@@ -85,24 +86,38 @@
     function renderMonitor(missions) {
         const body = document.getElementById('monitorBody');
         const activeMissions = missions.filter(m => m.status === 'active' || m.status === 'En cours');
-        document.getElementById('count').innerText = activeMissions.length + " MISSION(S) EN COURS";
+        
+        document.getElementById('count').innerText = activeMissions.length + " MISSION(S) ACTIVE(S)";
         
         if (activeMissions.length === 0) {
-            body.innerHTML = '<div class="empty">VEILLE SANITAIRE...</div>';
+            body.innerHTML = '<div style="text-align:center; padding:100px; opacity:0.2; font-weight:900;">VEILLE SANITAIRE</div>';
             return;
         }
 
-        body.innerHTML = activeMissions.map(m => {
-            const hS = m.start ? new Date(m.start).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '--:--';
-            const hE = m.end ? new Date(m.end).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '';
-            
-            // Logique pour le texte du bandeau (Correction Log)
+        // TRI PAR DATE ET HEURE (Important !)
+        activeMissions.sort((a, b) => new Date(a.start) - new Date(b.start));
+
+        let html = '';
+        let lastDate = "";
+
+        activeMissions.forEach(m => {
+            const dateObj = new Date(m.start);
+            const dateStr = dateObj.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+            const hS = dateObj.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+            const hE = m.end ? new Date(m.end).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '';
+
+            // Ajouter un bandeau si on change de jour
+            if (dateStr !== lastDate) {
+                html += `<div class="date-separator">🗓️ ${dateStr}</div>`;
+                lastDate = dateStr;
+            }
+
             let prioLabel = "Mission #" + m.pdgId;
             if (m.priority === 'p0') prioLabel = '🚨 PRIORITÉ ABSOLUE';
             if (m.priority === 'log') prioLabel = '⚪ MISSION LOGISTIQUE';
 
-            return `
-            <div class="card ${m.priority}">
+            html += `
+            <div class="card ${m.priority}" style="margin-bottom:20px;">
                 <div class="card-header">${prioLabel}</div>
                 <div class="card-body">
                     <div class="time-box">
@@ -115,14 +130,16 @@
                         <b>Secteurs :</b> ${m.sectors || 'Tous'}<br>
                         <b>Resp :</b> ${m.resp}
                     </div>
-                    ${m.note ? `<div class="note">"${m.note}"</div>` : ''}
+                    ${m.note ? `<div style="font-style:italic; margin-top:10px; opacity:0.8;">"${m.note}"</div>` : ''}
                 </div>
                 <div class="status-bar">
                     <div class="badge ${m.gcs ? 'on' : 'off'}">GCS</div>
                     <div class="badge ${m.cpf ? 'on' : 'off'}">CPF</div>
                 </div>
             </div>`;
-        }).join('');
+        });
+
+        body.innerHTML = html;
     }
 
     setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('fr-FR'); }, 1000);
