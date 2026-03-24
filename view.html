@@ -10,6 +10,7 @@
         :root { 
             --bg: #020617; --fids: #ffcc00; --accent: #38bdf8; 
             --p0: #ffff00; --p1: #ef4444; --p2: #3b82f6;
+            --log: #4b5320; /* Vert Olive pour LOG */
         }
         
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 10px; box-sizing: border-box; }
@@ -17,7 +18,6 @@
         header { border-bottom: 3px solid var(--fids); padding: 10px 0; margin-bottom: 20px; text-align: center; }
         .clock { font-family: monospace; font-size: 2.5em; font-weight: 900; color: var(--fids); margin-top: 5px; }
         
-        /* LA TUILE VERTICALE HAUTE */
         .grid-monitor { display: flex; flex-direction: column; gap: 20px; }
         
         .card { 
@@ -26,18 +26,19 @@
             overflow: hidden; 
             display: flex; 
             flex-direction: column;
-            min-height: 500px; /* Augmente la hauteur de 3-4 fois */
+            min-height: 500px;
             border: 2px solid rgba(255,255,255,0.1);
         }
         
-        /* Bandeau de priorité */
         .card-header { padding: 15px; font-weight: 900; text-align: center; text-transform: uppercase; font-size: 1.2em; background: var(--p2); color: white; }
+        
+        /* GESTION COULEURS PRIORITÉS (Correction Log) */
         .card.p0 .card-header { background: #000; color: var(--p0); animation: pulse 1.5s infinite; }
         .card.p1 .card-header { background: var(--p1); }
+        .card.log .card-header { background: var(--log); color: white; } /* LOG = VERT OLIVE */
 
         .card-body { padding: 25px; flex: 1; display: flex; flex-direction: column; justify-content: space-around; text-align: center; }
 
-        /* Titre et Lieu en format MASSF */
         .mission-title { font-size: 3em; font-weight: 900; line-height: 1; margin: 0; color: var(--fids); text-transform: uppercase; }
         .loc-box { font-size: 2.2em; font-weight: 800; color: #fff; background: rgba(56, 189, 248, 0.2); padding: 15px; border-radius: 12px; margin: 20px 0; border: 1px solid var(--accent); }
         
@@ -45,8 +46,7 @@
         .card.p0 .loc-box { color: #000; background: rgba(0,0,0,0.1); border-color: #000; }
         .card.p0 .card-body { background: var(--p0); }
 
-        /* Horaires et Infos */
-        .time-box { font-size: 1.8em; font-weight: 900; color: var(--accent); margin: 15px 0; }
+        .time-box { font-size: 1.8em; font-weight: 900; color: var(--accent); margin: 15px 0; display: flex; flex-direction: column; gap: 5px; }
         .card.p0 .time-box { color: #000; }
 
         .meta-info { font-size: 1.3em; opacity: 0.9; margin-bottom: 20px; }
@@ -84,7 +84,7 @@
 
     function renderMonitor(missions) {
         const body = document.getElementById('monitorBody');
-        const activeMissions = missions.filter(m => m.status === 'active');
+        const activeMissions = missions.filter(m => m.status === 'active' || m.status === 'En cours');
         document.getElementById('count').innerText = activeMissions.length + " MISSION(S) EN COURS";
         
         if (activeMissions.length === 0) {
@@ -94,13 +94,23 @@
 
         body.innerHTML = activeMissions.map(m => {
             const hS = m.start ? new Date(m.start).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '--:--';
+            const hE = m.end ? new Date(m.end).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '';
+            
+            // Logique pour le texte du bandeau (Correction Log)
+            let prioLabel = "Mission #" + m.pdgId;
+            if (m.priority === 'p0') prioLabel = '🚨 PRIORITÉ ABSOLUE';
+            if (m.priority === 'log') prioLabel = '⚪ MISSION LOGISTIQUE';
+
             return `
             <div class="card ${m.priority}">
-                <div class="card-header">${m.priority === 'p0' ? '🚨 PRIORITÉ ABSOLUE' : 'Mission #'+m.pdgId}</div>
+                <div class="card-header">${prioLabel}</div>
                 <div class="card-body">
-                    <div class="time-box">⏱️ DÉBUT : ${hS}</div>
-                    <h1 class="mission-title">${m.title}</h1>
-                    <div class="loc-box">📍 ${m.loc}</div>
+                    <div class="time-box">
+                        <div>⏱️ DÉBUT : ${hS}</div>
+                        ${hE ? `<div style="color:var(--danger); font-size:0.8em;">FIN EST. : ${hE}</div>` : ''}
+                    </div>
+                    <h1 class="mission-title">${m.title.toUpperCase()}</h1>
+                    <div class="loc-box">📍 ${m.loc.toUpperCase()}</div>
                     <div class="meta-info">
                         <b>Secteurs :</b> ${m.sectors || 'Tous'}<br>
                         <b>Resp :</b> ${m.resp}
