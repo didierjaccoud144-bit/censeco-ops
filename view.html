@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CENSECO 2026 - MONITOR V3.3</title>
+    <title>CENSECO 2026 - MONITOR V3.4</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <style>
@@ -17,7 +17,6 @@
         header { border-bottom: 3px solid var(--fids); padding: 10px 0; margin-bottom: 20px; text-align: center; }
         .clock { font-family: monospace; font-size: 2.8em; font-weight: 900; color: var(--fids); line-height: 1; }
         
-        /* BANDEAU DATE SEULE */
         .current-date-text { 
             font-size: 1.1em; 
             color: white; 
@@ -40,6 +39,7 @@
             background: #1e293b; border-radius: 20px; overflow: hidden; 
             display: flex; flex-direction: column; min-height: 500px; 
             border: 2px solid rgba(255,255,255,0.1); 
+            margin-bottom: 10px;
         }
         
         .card-header { padding: 15px; font-weight: 900; text-align: center; text-transform: uppercase; font-size: 1.2em; background: var(--p2); color: white; }
@@ -50,7 +50,6 @@
         .card-body { padding: 25px; flex: 1; display: flex; flex-direction: column; justify-content: space-around; text-align: center; }
         .mission-title { font-size: 3em; font-weight: 900; line-height: 1.1; margin: 10px 0; color: var(--fids); text-transform: uppercase; }
         
-        /* CORRECTION P0 TEXTE NOIR */
         .card.p0 .card-body { background: var(--p0); color: #000; }
         .card.p0 .mission-title, .card.p0 .time-box, .card.p0 .loc-box { color: #000; }
         .card.p0 .loc-box { border-color: #000; background: rgba(0,0,0,0.05); }
@@ -84,12 +83,9 @@
 
     function updateHeader() {
         const now = new Date();
-        // Horloge FIDS
         document.getElementById('clock').innerText = now.toLocaleTimeString('fr-FR');
-        // Date textuelle pure
         const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-        const dateStr = now.toLocaleDateString('fr-FR', options);
-        document.getElementById('dateDisplay').innerText = `Nous sommes le ${dateStr}`;
+        document.getElementById('dateDisplay').innerText = `Nous sommes le ${now.toLocaleDateString('fr-FR', options)}`;
     }
 
     dbRef.on('value', snap => {
@@ -101,21 +97,53 @@
     function renderMonitor(missions) {
         const body = document.getElementById('monitorBody');
         const now = new Date();
+        const todayStr = now.toISOString().split('T')[0];
 
-        const displayList = missions.filter(m => {
-            const isActive = (m.status === 'active' || m.status === 'En cours');
-            if (!isActive) return false;
-            if (!m.end) return true;
-            
-            const endLimit = new Date(m.end);
-            endLimit.setMinutes(endLimit.getMinutes() + 15);
-            return endLimit > now;
+        let expandedMissions = [];
+
+        // ÉTAPE 1 : DUPLICATION POUR MULTI-JOURS
+        missions.forEach(m => {
+            if (m.status !== 'active' && m.status !== 'En cours') return;
+
+            const startDay = new Date(m.start.split('T')[0]);
+            const endDay = m.end ? new Date(m.end.split('T')[0]) : new Date(m.start.split('T')[0]);
+
+            let tempDate = new Date(startDay);
+            while (tempDate <= endDay) {
+                const isoDay = tempDate.toISOString().split('T')[0];
+                
+                // On n'affiche pas les jours déjà passés de la mission
+                if (isoDay >= todayStr) {
+                    expandedMissions.push({
+                        ...m,
+                        displayDateISO: isoDay
+                    });
+                }
+                tempDate.setDate(tempDate.getDate() + 1);
+            }
         });
 
-        // Tri chronologique correct (Date + Heure)
-        displayList.sort((a, b) => new Date(a.start) - new Date(b.start));
+        // ÉTAPE 2 : FILTRE DE FIN DE MISSION (Dernier jour + 15 min)
+        const displayList = expandedMissions.filter(m => {
+            if (!m.end) return true;
+            const isLastDay = (m.displayDateISO === m.end.split('T')[0]);
+            if (isLastDay) {
+                const endLimit = new Date(m.end);
+                endLimit.setMinutes(endLimit.getMinutes() + 15);
+                return endLimit > now;
+            }
+            return true;
+        });
 
-        document.getElementById('count').innerText = displayList.length + " MISSION(S) ACTIVE(S)";
+        // ÉTAPE 3 : TRI CHRONOLOGIQUE (Date d'affichage puis heure de début)
+        displayList.sort((a, b) => {
+            if (a.displayDateISO !== b.displayDateISO) {
+                return a.displayDateISO.localeCompare(b.displayDateISO);
+            }
+            return new Date(a.start) - new Date(b.start);
+        });
+
+        document.getElementById('count').innerText = displayList.length + " MISSION(S) ACTIVE(S) SUR LE MONITOR";
         
         if (displayList.length === 0) {
             body.innerHTML = '<div style="text-align:center; padding-top:100px; opacity:0.3; font-weight:900; font-size:1.5em;">AUCUNE MISSION ACTUELLE</div>';
@@ -126,14 +154,15 @@
         let lastDateHeader = '';
 
         displayList.forEach(m => {
-            const startObj = new Date(m.start);
-            const dateTitle = startObj.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase();
-            const hS = startObj.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+            const currentDisplayDate = new Date(m.displayDateISO);
+            const dateTitle = currentDisplayDate.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' }).toUpperCase();
+            
+            const hS = new Date(m.start).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
             const hE = m.end ? new Date(m.end).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '';
 
-            if (dateTitle !== lastDateHeader) {
+            if (m.displayDateISO !== lastDateHeader) {
                 html += `<div class="date-separator">🗓️ ${dateTitle}</div>`;
-                lastDateHeader = dateTitle;
+                lastDateHeader = m.displayDateISO;
             }
 
             let prioLabel = "Mission #" + m.pdgId;
@@ -147,7 +176,7 @@
                     <div class="time-box">
                         <div style="font-size:0.6em; opacity:0.8; text-transform:uppercase; font-weight:800;">⏱️ ${dateTitle.split(' ')[0]}</div>
                         <div>DÉBUT : ${hS}</div>
-                        ${hE ? `<div style="color:var(--danger); font-size:0.8em; font-weight:900;">FIN EST. : ${hE}</div>` : ''}
+                        ${hE ? `<div style="color:var(--p1); font-size:0.8em; font-weight:900;">FIN EST. : ${hE}</div>` : ''}
                     </div>
                     <h1 class="mission-title">${m.title.toUpperCase()}</h1>
                     <div class="loc-box">📍 ${m.loc.toUpperCase()}</div>
@@ -168,8 +197,6 @@
     }
 
     setInterval(updateHeader, 1000);
-    
-    // Auto-refresh des missions pour le filtre temporel (chaque min)
     setInterval(() => {
         dbRef.once('value', snap => {
             const d = snap.val();
