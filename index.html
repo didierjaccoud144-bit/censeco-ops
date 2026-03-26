@@ -219,25 +219,38 @@
         if(!p0Cont || !lineCont) return;
         p0Cont.innerHTML = ''; lineCont.innerHTML = '';
         
+        // On ne garde que les missions actives (Saisie + Log)
         const active = db_missions.filter(m => m && m.status === 'active');
         
+        // 1. ZONE P0 (Urgence en haut)
         const p0s = active.filter(m => m.priority === 'p0');
         if(p0s.length > 0) {
             p0Cont.innerHTML = `<div class="p0-emergency-zone"><div style="color:red; font-weight:900; margin-bottom:10px;">🚨 MISSIONS P0 EN COURS</div></div>`;
             p0s.forEach(m => p0Cont.firstChild.innerHTML += createRowHtml(m));
         }
         
+        // 2. GROUPEMENT MULTI-JOURS (P1, P2, P3, LOG)
         const others = active.filter(m => m.priority !== 'p0');
         const days = {};
         
-        // On groupe par date ISO (yyyy-mm-dd) pour un tri facile
         others.forEach(m => {
-            let startISO = m.start.split('T')[0];
-            if(!days[startISO]) days[startISO] = [];
-            days[startISO].push(m);
+            if(!m.start) return;
+            
+            // Calcul de l'intervalle de jours
+            let current = new Date(m.start.split('T')[0]);
+            let last = m.end ? new Date(m.end.split('T')[0]) : new Date(m.start.split('T')[0]);
+
+            // On ajoute la mission à chaque jour entre le début et la fin
+            let tempDate = new Date(current);
+            while (tempDate <= last) {
+                let isoDate = tempDate.toISOString().split('T')[0];
+                if (!days[isoDate]) days[isoDate] = [];
+                days[isoDate].push(m);
+                tempDate.setDate(tempDate.getDate() + 1);
+            }
         });
 
-        // Tri alphabétique des ISO dates (donc chronologique)
+        // 3. RENDU CHRONOLOGIQUE PAR JOUR
         Object.keys(days).sort().forEach(isoDate => {
             const dateObj = new Date(isoDate);
             const dStr = dateObj.toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long'});
@@ -255,6 +268,7 @@
                 });
             }
         });
+    }
     }
 
     function createRowHtml(m) {
