@@ -213,34 +213,31 @@
         renderRetex();
     }
 
-    // --- CORRECTION DU TRI CHRONOLOGIQUE ICI ---
+    // --- LOGIQUE DE RENDU CORRIGÉE : MULTI-JOURS + TRI ISO ---
     function renderTimeline(p0Id, timelineId) {
         const p0Cont = document.getElementById(p0Id); const lineCont = document.getElementById(timelineId);
         if(!p0Cont || !lineCont) return;
         p0Cont.innerHTML = ''; lineCont.innerHTML = '';
         
-        // On ne garde que les missions actives (Saisie + Log)
         const active = db_missions.filter(m => m && m.status === 'active');
         
-        // 1. ZONE P0 (Urgence en haut)
+        // 1. Les P0 restent en zone d'urgence
         const p0s = active.filter(m => m.priority === 'p0');
         if(p0s.length > 0) {
             p0Cont.innerHTML = `<div class="p0-emergency-zone"><div style="color:red; font-weight:900; margin-bottom:10px;">🚨 MISSIONS P0 EN COURS</div></div>`;
             p0s.forEach(m => p0Cont.firstChild.innerHTML += createRowHtml(m));
         }
         
-        // 2. GROUPEMENT MULTI-JOURS (P1, P2, P3, LOG)
         const others = active.filter(m => m.priority !== 'p0');
         const days = {};
         
+        // 2. Groupement par jour avec duplication pour multi-jours
         others.forEach(m => {
             if(!m.start) return;
             
-            // Calcul de l'intervalle de jours
             let current = new Date(m.start.split('T')[0]);
             let last = m.end ? new Date(m.end.split('T')[0]) : new Date(m.start.split('T')[0]);
 
-            // On ajoute la mission à chaque jour entre le début et la fin
             let tempDate = new Date(current);
             while (tempDate <= last) {
                 let isoDate = tempDate.toISOString().split('T')[0];
@@ -250,7 +247,7 @@
             }
         });
 
-        // 3. RENDU CHRONOLOGIQUE PAR JOUR
+        // 3. Tri chronologique par Date ISO
         Object.keys(days).sort().forEach(isoDate => {
             const dateObj = new Date(isoDate);
             const dStr = dateObj.toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long'});
@@ -262,13 +259,12 @@
             </div>`;
             
             if(!isColl) {
-                // Tri interne à la journée par heure de début
+                // Tri par heure au sein d'une journée
                 days[isoDate].sort((a,b) => new Date(a.start) - new Date(b.start)).forEach(m => {
                     lineCont.innerHTML += createRowHtml(m);
                 });
             }
         });
-    }
     }
 
     function createRowHtml(m) {
@@ -340,8 +336,8 @@
     function shareWA(id, t, l) { window.open(`https://wa.me/?text=${encodeURIComponent('*'+id+'* - '+t+'\n📍 '+l)}`); }
     function toggleDay(d) { if(collapsedDays.includes(d)) collapsedDays = collapsedDays.filter(x => x !== d); else collapsedDays.push(d); renderAll(); }
     function archiveMission(id) { if(confirm("Clôturer ?")) { const idx = db_missions.findIndex(x=>x.id==id); db_missions[idx].status='archived'; dbRef.set({data:db_missions, counter:counter_pdg}); } }
-    
-    // --- CORRECTION DU BOUTON EDIT ICI ---
+
+    // --- MISE À JOUR VISUELLE DES BOUTONS LORS DE L'EDITION ---
     function editMission(id) { 
         const m = db_missions.find(x=>x.id==id); 
         document.getElementById('editTaskId').value = m.id; 
@@ -349,11 +345,10 @@
         document.getElementById('tLoc').value = m.loc; 
         document.getElementById('tStart').value = m.start; 
         document.getElementById('tEnd').value = m.end; 
-        document.getElementById('tNote').value = m.note || "";
+        document.getElementById('tNote').value = m.note || '';
         document.getElementById('checkGCS').checked = m.gcs || false;
         document.getElementById('checkCPF').checked = m.cpf || false;
 
-        // Mise à jour visuelle des boutons de sélection
         selectedPrio = m.priority;
         selectedResp = m.resp;
         selectedSects = m.sectors || [];
@@ -370,8 +365,9 @@
 
         showPage('ops', document.querySelectorAll('.nav-btn')[0]); 
     }
-    
+
     function deleteMission(id) { if(confirm("Supprimer ?")) { db_missions = db_missions.filter(x=>x.id !== id); dbRef.set({data:db_missions, counter:counter_pdg}); } }
+    
     function resetForm() { 
         document.getElementById('editTaskId').value=''; 
         document.getElementById('tTitle').value=''; 
@@ -380,13 +376,11 @@
         document.getElementById('checkGCS').checked = false;
         document.getElementById('checkCPF').checked = false;
         adjTime(0); 
-        document.querySelectorAll('.btn-opt').forEach(x=>x.classList.remove('active')); 
-        // Réinit les variables de sélection par défaut
-        selectedPrio = "p2";
-        selectedResp = "";
-        selectedSects = [];
+        document.querySelectorAll('.btn-opt').forEach(x=>x.classList.remove('active'));
+        selectedPrio = "p2"; selectedResp = ""; selectedSects = [];
         document.querySelector('.btn-prio[data-val="p2"]').classList.add('active');
     }
+
     function showPage(id, e) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active')); (e.target || e).classList.add('active'); }
 </script>
 </body>
