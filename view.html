@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CENSECO 2026 - MONITOR V3.4</title>
+    <title>CENSECO 2026 - MONITOR V3.5</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <style>
         :root { 
             --bg: #020617; --fids: #ffcc00; --accent: #38bdf8; 
             --p0: #ffff00; --p1: #ef4444; --p2: #3b82f6; --log: #4b5320;
+            --date-bg: #ffffff; --date-text: #000000;
         }
         
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 10px; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: white; margin: 0; padding: 10px; box-sizing: border-box; padding-bottom: 50px; }
         
         header { border-bottom: 3px solid var(--fids); padding: 10px 0; margin-bottom: 20px; text-align: center; }
         .clock { font-family: monospace; font-size: 2.8em; font-weight: 900; color: var(--fids); line-height: 1; }
@@ -28,11 +29,24 @@
 
         .grid-monitor { display: flex; flex-direction: column; gap: 20px; }
         
+        /* NOUEAU DESIGN BANDEAU DATE : FOND BLANC / TEXTE NOIR */
         .date-separator { 
-            background: #1e293b; color: var(--fids); padding: 10px; 
-            font-weight: 900; text-align: center; text-transform: uppercase; 
-            border-radius: 10px; margin: 10px 0; border: 1px solid var(--fids);
-            letter-spacing: 2px; font-size: 1.1em;
+            background: var(--date-bg); 
+            color: var(--date-text); 
+            padding: 15px; 
+            font-weight: 900; 
+            text-align: center; 
+            text-transform: uppercase; 
+            border-radius: 12px; 
+            margin: 25px 0 10px 0; 
+            border: 2px solid #cbd5e1;
+            letter-spacing: 3px; 
+            font-size: 1.3em;
+            box-shadow: 0 5px 15px rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
         }
 
         .card { 
@@ -161,7 +175,8 @@
             const hE = m.end ? new Date(m.end).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '';
 
             if (m.displayDateISO !== lastDateHeader) {
-                html += `<div class="date-separator">🗓️ ${dateTitle}</div>`;
+                // Rendu du nouveau bandeau Date (symbole + texte)
+                html += `<div class="date-separator"><span>🗓️</span> <span>${dateTitle}</span></div>`;
                 lastDateHeader = m.displayDateISO;
             }
 
@@ -174,7 +189,7 @@
                 <div class="card-header">${prioLabel}</div>
                 <div class="card-body">
                     <div class="time-box">
-                        <div style="font-size:0.6em; opacity:0.8; text-transform:uppercase; font-weight:800;">⏱️ ${dateTitle.split(' ')[0]}</div>
+                        <div style="font-size:0.6em; opacity:0.8; text-transform:uppercase; font-weight:800; color:var(--accent);">⏱️ ${dateTitle.split(' ')[0]}</div>
                         <div>DÉBUT : ${hS}</div>
                         ${hE ? `<div style="color:var(--p1); font-size:0.8em; font-weight:900;">FIN EST. : ${hE}</div>` : ''}
                     </div>
