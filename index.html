@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CENSECO 2026 - V29.2 MASTER PRO</title>
+    <title>CENSECO 2026 - V29.3 MASTER PRO</title>
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
@@ -70,7 +70,7 @@
 <body>
 
 <header>
-    <div style="font-weight: 900;">CENSECO 2026 - <span style="color:var(--fids)">V29.2 MASTER</span></div>
+    <div style="font-weight: 900;">CENSECO 2026 - <span style="color:var(--fids)">V29.3 MASTER</span></div>
     <div id="clock">00:00:00</div>
 </header>
 
@@ -163,13 +163,11 @@
 
     function renderAll() {
         document.getElementById('nextPdgId').innerText = "PDG-" + counter_pdg;
-        renderTimeline('p0ZoneOps', 'timelineOps');
-        renderTimeline('p0ZoneLog', 'timelineLog');
-        renderRetex();
+        renderTimeline('p0ZoneOps', 'timelineOps', 'ops');
+        renderTimeline('p0ZoneLog', 'timelineLog', 'log');
     }
 
-    // --- RENDER TIMELINE CORRIGÉ (ID DE NOTE STABLE) ---
-    function renderTimeline(p0Id, timelineId) {
+    function renderTimeline(p0Id, timelineId, prefix) {
         const p0Cont = document.getElementById(p0Id); const lineCont = document.getElementById(timelineId);
         if(!p0Cont || !lineCont) return;
         p0Cont.innerHTML = ''; lineCont.innerHTML = '';
@@ -178,8 +176,7 @@
         const p0s = active.filter(m => m.priority === 'p0');
         if(p0s.length > 0) {
             p0Cont.innerHTML = `<div class="p0-emergency-zone"><div style="color:red; font-weight:900; margin-bottom:10px;">🚨 MISSIONS P0 EN COURS</div></div>`;
-            // Pour P0, on utilise un suffixe fixe
-            p0s.forEach(m => p0Cont.firstChild.innerHTML += createRowHtml(m, "p0"));
+            p0s.forEach(m => p0Cont.firstChild.innerHTML += createRowHtml(m, "p0", prefix));
         }
         
         const others = active.filter(m => m.priority !== 'p0');
@@ -189,7 +186,6 @@
             if(!m.start) return;
             let current = new Date(m.start.split('T')[0]);
             let last = m.end ? new Date(m.end.split('T')[0]) : new Date(m.start.split('T')[0]);
-
             let tempDate = new Date(current);
             while (tempDate <= last) {
                 let isoDate = tempDate.toISOString().split('T')[0];
@@ -211,19 +207,16 @@
             
             if(!isColl) {
                 days[isoDate].sort((a,b) => new Date(a.start) - new Date(b.start)).forEach(m => {
-                    // Pour le LOG, on utilise la date ISO pour rendre l'ID unique par jour
-                    lineCont.innerHTML += createRowHtml(m, isoDate);
+                    lineCont.innerHTML += createRowHtml(m, isoDate, prefix);
                 });
             }
         });
     }
 
-    function createRowHtml(m, dayKey) {
+    function createRowHtml(m, dayKey, prefix) {
         const sH = m.start ? new Date(m.start).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '--:--';
         const eH = m.end ? new Date(m.end).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '';
-        
-        // CORRECTION : L'ID de la note est basé sur l'ID mission + la clé du jour pour être stable
-        const noteId = `note-${m.id}-${dayKey.replace(/[^a-zA-Z0-9]/g, '')}`;
+        const noteId = `note-${prefix}-${m.id}-${dayKey.replace(/[^a-zA-Z0-9]/g, '')}`;
         
         return `
         <div class="mission-row-container">
@@ -251,16 +244,13 @@
 
     function toggleNote(id) {
         const el = document.getElementById(id);
-        if (el) {
-            el.style.display = (el.style.display === 'block') ? 'none' : 'block';
-        }
+        if (el) el.style.display = (el.style.display === 'block') ? 'none' : 'block';
     }
 
-    // Fonctions de support identiques (WA, Archive, Edit, etc.)
-    function shareWA(id, t, l) { window.open(`https://wa.me/?text=${encodeURIComponent('*'+id+'* - '+t+'\n📍 '+l)}`); }
     function toggleDay(d) { if(collapsedDays.includes(d)) collapsedDays = collapsedDays.filter(x => x !== d); else collapsedDays.push(d); renderAll(); }
+    function shareWA(id, t, l) { window.open(`https://wa.me/?text=${encodeURIComponent('*'+id+'* - '+t+'\n📍 '+l)}`); }
     function archiveMission(id) { if(confirm("Clôturer ?")) { const idx = db_missions.findIndex(x=>x.id==id); db_missions[idx].status='archived'; dbRef.set({data:db_missions, counter:counter_pdg}); } }
-    
+
     function editMission(id) { 
         const m = db_missions.find(x=>x.id==id); 
         document.getElementById('editTaskId').value = m.id; 
@@ -287,7 +277,6 @@
     }
 
     function showPage(id, e) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active')); (e.target || e).classList.add('active'); }
-    function renderRetex() { /* Identique à ta version précédente */ }
 </script>
 </body>
 </html>
