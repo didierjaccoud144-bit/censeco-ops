@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CENSECO 2026 - V29.3 MASTER PRO</title>
+    <title>CENSECO 2026 - V29.4 MASTER PRO</title>
 
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
@@ -24,6 +24,7 @@
         .container { flex: 1; overflow-y: auto; padding: 15px; box-sizing: border-box; }
         .page { display: none; } .page.active { display: block; }
 
+        /* FORMULAIRE */
         .t-form { background: var(--dark); color: white; padding: 20px; border-radius: 8px; margin-bottom: 15px; }
         .t-row { display: flex; gap: 15px; align-items: flex-end; margin-bottom: 12px; }
         .t-col { display: flex; flex-direction: column; gap: 5px; }
@@ -36,6 +37,7 @@
         .quick-btn { background: #334155; border: none; color: white; padding: 5px 10px; border-radius: 3px; font-size: 0.75em; cursor: pointer; font-style: italic; }
         .btn-submit { background: var(--success); color: white; border: none; padding: 12px 30px; border-radius: 6px; font-weight: 900; cursor: pointer; box-shadow: 0 4px 0 #065f46; }
 
+        /* LIGNES LOG */
         .mission-row-container { margin-bottom: 8px; }
         .mission-row { display: flex; align-items: center; background: white; border-radius: 8px; border: 1px solid #cbd5e1; height: 95px; position: relative; overflow: hidden; }
         .row-item { padding: 0 10px; border-right: 1px solid rgba(0,0,0,0.05); height: 100%; display: flex; flex-direction: column; justify-content: center; }
@@ -62,6 +64,20 @@
         .day-sep { background: #000; color: var(--fids); padding: 10px 15px; font-weight: 900; border-radius: 8px; margin: 20px 0 10px 0; cursor: pointer; display: flex; justify-content: space-between; border: 2px solid var(--fids); }
         .p0-emergency-zone { border: 4px solid var(--danger); background: #fff5f5; padding: 10px; border-radius: 12px; margin-bottom: 20px; }
 
+        /* STATS */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: white; padding: 20px; border-radius: 12px; text-align: center; border-top: 6px solid var(--accent); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .stat-num { font-size: 2.8em; font-weight: 900; display: block; line-height: 1; }
+        .chart-box { background: white; padding: 20px; border-radius: 12px; border: 1px solid #cbd5e1; margin-bottom: 20px; }
+        .time-slot-container { display: flex; justify-content: space-between; align-items: flex-end; height: 120px; padding: 10px 20px; background: #f8fafc; border-radius: 12px; gap: 15px; }
+        .time-bar-wrapper { flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; }
+        .time-bar { width: 100%; border-radius: 6px 6px 0 0; min-height: 4px; transition: height 0.8s; position: relative; }
+        .time-bar-val { position: absolute; top: -25px; width: 100%; text-align: center; font-weight: 900; font-size: 0.85em; }
+        .time-bar-label { font-size: 0.65em; font-weight: 900; color: #64748b; margin-top: 8px; text-transform: uppercase; }
+        .bar-track { background: #e2e8f0; height: 12px; border-radius: 6px; overflow: hidden; margin-top: 5px; }
+        .bar-fill { height: 100%; background: var(--accent); transition: width 0.6s; }
+
+        /* RETEX */
         .retex-card { background: white; padding: 15px; border-radius: 10px; border: 1px solid #cbd5e1; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
         .retex-form { background: #fff; padding: 20px; border-radius: 12px; border: 2px solid var(--accent); margin-bottom: 20px; display: none; }
         #pdfTemplate { display: none; padding: 40px; background: white; color: black; }
@@ -70,7 +86,7 @@
 <body>
 
 <header>
-    <div style="font-weight: 900;">CENSECO 2026 - <span style="color:var(--fids)">V29.3 MASTER</span></div>
+    <div style="font-weight: 900;">CENSECO 2026 - <span style="color:var(--fids)">V29.4 MASTER</span></div>
     <div id="clock">00:00:00</div>
 </header>
 
@@ -120,18 +136,47 @@
     </div>
 
     <div id="stats" class="page">
-        <div class="stats-grid" id="statsGrid"></div>
-        <div id="timeSlotVisual"></div>
+        <div class="stats-grid">
+            <div class="stat-card"><span class="stat-num" id="stTotal">0</span>TOTAL</div>
+            <div class="stat-card" style="border-color:var(--danger)"><span class="stat-num" id="stUrgent" style="color:var(--danger)">0</span>URGENTS</div>
+            <div class="stat-card" style="border-color:var(--accent)"><span class="stat-num" id="stStd" style="color:var(--accent)">0</span>P2 / P3</div>
+            <div class="stat-card" style="border-color:var(--success)"><span class="stat-num" id="stDuree" style="color:var(--success)">-</span>DURÉE MOY.</div>
+        </div>
+        <div class="chart-box"><div class="info-label">Intensité par Créneaux Horaires</div><div class="time-slot-container" id="timeSlotVisual"></div></div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+            <div class="chart-box"><div class="info-label">Secteurs</div><div id="secChart"></div></div>
+            <div class="chart-box"><div class="info-label">Responsables</div><div id="respChart"></div></div>
+        </div>
+        <div class="chart-box"><div class="info-label">Suivi GCS/CPF</div><div id="followChart"></div></div>
     </div>
 
     <div id="retex" class="page">
-        <div id="retexFormZone" class="retex-form"></div>
+        <div id="retexFormZone" class="retex-form">
+            <h3 id="retexTitle">Analyse Mission</h3>
+            <input type="hidden" id="retexId">
+            <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:15px; margin-bottom:15px;">
+                <div><label class="t-label" style="color:var(--success)">✅ Positif</label><textarea id="retPos" rows="4"></textarea></div>
+                <div><label class="t-label" style="color:var(--fids)">⚠️ Améliorer</label><textarea id="retImp" rows="4"></textarea></div>
+                <div><label class="t-label" style="color:var(--danger)">🚀 Actions</label><textarea id="retCor" rows="4"></textarea></div>
+            </div>
+            <button class="btn-submit" onclick="saveRetex()">ARCHIVER DÉFINITIVEMENT</button>
+            <button class="btn-opt" onclick="closeRetex()" style="margin-left:10px;">Annuler</button>
+        </div>
+        <div class="day-sep">📥 SAS DE CLÔTURE</div>
         <div id="sasContent"></div>
+        <div class="day-sep" style="background:var(--accent)">📂 ARCHIVES DÉFINITIVES</div>
         <div id="archiveContent"></div>
     </div>
 </div>
 
-<div id="pdfTemplate"></div>
+<div id="pdfTemplate">
+    <h1 id="pdfH1" style="border-bottom: 4px solid black;">RAPPORT DE MISSION PDG 2026</h1>
+    <p id="pdfMeta"></p><hr>
+    <div id="pdfDetails"></div><hr>
+    <div style="background:#f0fdf4; padding:10px; margin-top:10px;"><b>Points Positifs :</b><br><span id="pdfPos"></span></div>
+    <div style="background:#fffbeb; padding:10px; margin-top:10px;"><b>À Améliorer :</b><br><span id="pdfImp"></span></div>
+    <div style="background:#fef2f2; padding:10px; margin-top:10px;"><b>Actions :</b><br><span id="pdfCor"></span></div>
+</div>
 
 <script>
     const firebaseConfig = { apiKey: "AIzaSyA7zWuD_8yzhWARz-lSdHmDrcr7M9kHFHU", authDomain: "censeco-2026.firebaseapp.com", databaseURL: "https://censeco-2026-default-rtdb.europe-west1.firebasedatabase.app", projectId: "censeco-2026", storageBucket: "censeco-2026.firebasestorage.app", messagingSenderId: "1030152312862", appId: "1:1030152312862:web:9618132ec2bcfc7831b60f" };
@@ -165,23 +210,22 @@
         document.getElementById('nextPdgId').innerText = "PDG-" + counter_pdg;
         renderTimeline('p0ZoneOps', 'timelineOps', 'ops');
         renderTimeline('p0ZoneLog', 'timelineLog', 'log');
+        renderStats();
+        renderRetex();
     }
 
     function renderTimeline(p0Id, timelineId, prefix) {
         const p0Cont = document.getElementById(p0Id); const lineCont = document.getElementById(timelineId);
         if(!p0Cont || !lineCont) return;
         p0Cont.innerHTML = ''; lineCont.innerHTML = '';
-        
         const active = db_missions.filter(m => m && m.status === 'active');
         const p0s = active.filter(m => m.priority === 'p0');
         if(p0s.length > 0) {
             p0Cont.innerHTML = `<div class="p0-emergency-zone"><div style="color:red; font-weight:900; margin-bottom:10px;">🚨 MISSIONS P0 EN COURS</div></div>`;
             p0s.forEach(m => p0Cont.firstChild.innerHTML += createRowHtml(m, "p0", prefix));
         }
-        
         const others = active.filter(m => m.priority !== 'p0');
         const days = {};
-        
         others.forEach(m => {
             if(!m.start) return;
             let current = new Date(m.start.split('T')[0]);
@@ -194,22 +238,12 @@
                 tempDate.setDate(tempDate.getDate() + 1);
             }
         });
-
         Object.keys(days).sort().forEach(isoDate => {
             const dateObj = new Date(isoDate);
             const dStr = dateObj.toLocaleDateString('fr-FR', {weekday:'long', day:'numeric', month:'long'});
             const isColl = collapsedDays.includes(dStr);
-            
-            lineCont.innerHTML += `<div class="day-sep" onclick="toggleDay('${dStr}')">
-                <span>🗓️ ${dStr.toUpperCase()}</span>
-                <span>${isColl ? '[+]' : '[-]'}</span>
-            </div>`;
-            
-            if(!isColl) {
-                days[isoDate].sort((a,b) => new Date(a.start) - new Date(b.start)).forEach(m => {
-                    lineCont.innerHTML += createRowHtml(m, isoDate, prefix);
-                });
-            }
+            lineCont.innerHTML += `<div class="day-sep" onclick="toggleDay('${dStr}')"><span>🗓️ ${dStr.toUpperCase()}</span><span>${isColl ? '[+]' : '[-]'}</span></div>`;
+            if(!isColl) days[isoDate].sort((a,b) => new Date(a.start) - new Date(b.start)).forEach(m => lineCont.innerHTML += createRowHtml(m, isoDate, prefix));
         });
     }
 
@@ -217,36 +251,10 @@
         const sH = m.start ? new Date(m.start).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '--:--';
         const eH = m.end ? new Date(m.end).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : '';
         const noteId = `note-${prefix}-${m.id}-${dayKey.replace(/[^a-zA-Z0-9]/g, '')}`;
-        
-        return `
-        <div class="mission-row-container">
-            <div class="mission-row ${m.priority}">
-                <div class="prio-tab-v">${m.priority.toUpperCase()}</div>
-                <div class="row-item" style="width:80px; text-align:center;">
-                    <span class="info-label">HORAIRE</span>
-                    <span class="info-val" style="font-size:1.1em;">${sH}</span>
-                    ${eH ? `<span style="color:var(--danger); font-weight:900; font-size:0.7em; margin-top:2px;">FIN: ${eH}</span>` : ''}
-                </div>
-                <div class="row-item" style="width:85px;"><span class="info-label">ID PDG</span><span class="info-val" style="color:var(--accent)">${m.pdgId}</span></div>
-                <div class="row-item" style="flex:2;"><span class="info-val">${m.title}</span><div style="margin-top:4px;"><span style="color:var(--danger); font-weight:900; font-size:0.75em; margin-right:8px;">📍 ${m.loc}</span>${m.sectors ? m.sectors.map(s => `<span class="badge-sect">${s}</span>`).join('') : ''}</div></div>
-                <div class="row-item" style="width:100px;"><span class="info-label">RESP.</span><span class="info-val">${m.resp || '-'}</span></div>
-                <div class="row-item" style="width:65px;"><div style="display:flex; flex-direction:column; gap:2px;"><div class="status-pill ${m.gcs ? 'status-on' : 'status-off'}">GCS</div><div class="status-pill ${m.cpf ? 'status-on' : 'status-off'}">CPF</div></div></div>
-                <div class="row-item" style="border:none; flex-direction:row; gap:4px;">
-                    <button class="btn-action" onclick="toggleNote('${noteId}')" style="background:var(--fids); color:black;">👁️</button>
-                    <button class="btn-action" onclick="shareWA('${m.pdgId}','${m.title}','${m.loc}')" style="background:#25D366; color:white;">WA</button>
-                    <button class="btn-action" onclick="editMission(${m.id})">EDIT</button>
-                    <button class="btn-action btn-fin" onclick="archiveMission(${m.id})">FIN</button>
-                </div>
-            </div>
-            <div id="${noteId}" class="note-drawer">📝 Note : ${m.note || 'Aucune note tactique.'}</div>
-        </div>`;
+        return `<div class="mission-row-container"><div class="mission-row ${m.priority}"><div class="prio-tab-v">${m.priority.toUpperCase()}</div><div class="row-item" style="width:80px; text-align:center;"><span class="info-label">HORAIRE</span><span class="info-val" style="font-size:1.1em;">${sH}</span>${eH ? `<span style="color:var(--danger); font-weight:900; font-size:0.7em; margin-top:2px;">FIN: ${eH}</span>` : ''}</div><div class="row-item" style="width:85px;"><span class="info-label">ID PDG</span><span class="info-val" style="color:var(--accent)">${m.pdgId}</span></div><div class="row-item" style="flex:2;"><span class="info-val">${m.title}</span><div style="margin-top:4px;"><span style="color:var(--danger); font-weight:900; font-size:0.75em; margin-right:8px;">📍 ${m.loc}</span>${m.sectors ? m.sectors.map(s => `<span class="badge-sect">${s}</span>`).join('') : ''}</div></div><div class="row-item" style="width:100px;"><span class="info-label">RESP.</span><span class="info-val">${m.resp || '-'}</span></div><div class="row-item" style="width:65px;"><div style="display:flex; flex-direction:column; gap:2px;"><div class="status-pill ${m.gcs ? 'status-on' : 'status-off'}">GCS</div><div class="status-pill ${m.cpf ? 'status-on' : 'status-off'}">CPF</div></div></div><div class="row-item" style="border:none; flex-direction:row; gap:4px;"><button class="btn-action" onclick="toggleNote('${noteId}')" style="background:var(--fids); color:black;">👁️</button><button class="btn-action" onclick="shareWA('${m.pdgId}','${m.title}','${m.loc}')" style="background:#25D366; color:white;">WA</button><button class="btn-action" onclick="editMission(${m.id})">EDIT</button><button class="btn-action btn-fin" onclick="archiveMission(${m.id})">FIN</button></div></div><div id="${noteId}" class="note-drawer">📝 Note : ${m.note || 'Aucune note tactique.'}</div></div>`;
     }
 
-    function toggleNote(id) {
-        const el = document.getElementById(id);
-        if (el) el.style.display = (el.style.display === 'block') ? 'none' : 'block';
-    }
-
+    function toggleNote(id) { const el = document.getElementById(id); if (el) el.style.display = (el.style.display === 'block') ? 'none' : 'block'; }
     function toggleDay(d) { if(collapsedDays.includes(d)) collapsedDays = collapsedDays.filter(x => x !== d); else collapsedDays.push(d); renderAll(); }
     function shareWA(id, t, l) { window.open(`https://wa.me/?text=${encodeURIComponent('*'+id+'* - '+t+'\n📍 '+l)}`); }
     function archiveMission(id) { if(confirm("Clôturer ?")) { const idx = db_missions.findIndex(x=>x.id==id); db_missions[idx].status='archived'; dbRef.set({data:db_missions, counter:counter_pdg}); } }
@@ -277,6 +285,46 @@
     }
 
     function showPage(id, e) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active')); (e.target || e).classList.add('active'); }
+
+    /* MOTEUR STATS */
+    function renderStats() {
+        const active = db_missions.filter(m => m && m.status === 'active');
+        document.getElementById('stTotal').innerText = active.length;
+        document.getElementById('stUrgent').innerText = active.filter(m => m.priority === 'p0' || m.priority === 'p1').length;
+        document.getElementById('stStd').innerText = active.filter(m => m.priority === 'p2' || m.priority === 'p3').length;
+        let totalMin = 0, cDuree = 0, slots = [0,0,0,0];
+        active.forEach(m => {
+            if(m.start && m.end) { const diff = (new Date(m.end) - new Date(m.start)) / 60000; if(diff > 0) { totalMin += diff; cDuree++; } }
+            const h = new Date(m.start).getHours();
+            if(h >= 6 && h < 12) slots[0]++; else if(h >= 12 && h < 18) slots[1]++; else if(h >= 18 && h < 24) slots[2]++; else slots[3]++;
+        });
+        if(cDuree > 0) { const m = Math.round(totalMin/cDuree); document.getElementById('stDuree').innerText = m > 60 ? Math.floor(m/60)+'h'+(m%60).toString().padStart(2,'0') : m+'m'; }
+        const slotCont = document.getElementById('timeSlotVisual'); const labels = ["06h-12h", "12h-18h", "18h-00h", "00h-06h"]; const maxSlot = Math.max(...slots, 1);
+        slotCont.innerHTML = ''; slots.forEach((val, i) => {
+            const h = (val / maxSlot) * 80; slotCont.innerHTML += `<div class="time-bar-wrapper"><div class="time-bar" style="height:${h}px; background:${val === maxSlot ? 'var(--danger)' : 'var(--accent)'}"><div class="time-bar-val">${val}</div></div><div class="time-bar-label">${labels[i]}</div></div>`;
+        });
+        renderBar('secChart', getCounts(active, 'sectors'), 'var(--accent)');
+        renderBar('respChart', getCounts(active, 'resp'), 'var(--p3)');
+        renderBar('followChart', {'GCS Cochés': active.filter(m=>m.gcs).length, 'CPF Cochés': active.filter(m=>m.cpf).length}, 'var(--success)');
+    }
+    function getCounts(arr, key) { const c = {}; arr.forEach(m => { const v = m[key]; if(Array.isArray(v)) v.forEach(x => c[x] = (c[x]||0)+1); else if(v) c[v] = (c[v]||0)+1; }); return c; }
+    function renderBar(id, data, color) { const cont = document.getElementById(id); if(!cont) return; cont.innerHTML = ''; const max = Math.max(...Object.values(data), 1); Object.entries(data).sort((a,b)=>b[1]-a[1]).forEach(([l, v]) => { const p = (v/max)*100; cont.innerHTML += `<div style="margin-bottom:8px;"><div style="display:flex; justify-content:space-between; font-size:0.75em; font-weight:700;"><span>${l}</span><span>${v}</span></div><div class="bar-track"><div class="bar-fill" style="width:${p}%; background:${color}"></div></div></div>`; }); }
+
+    /* MOTEUR RETEX */
+    function renderRetex() {
+        const sas = document.getElementById('sasContent'); const arch = document.getElementById('archiveContent');
+        if(!sas || !arch) return;
+        sas.innerHTML = ''; arch.innerHTML = '';
+        db_missions.forEach(m => {
+            if(m.status === 'archived') sas.innerHTML += `<div class="retex-card"><span><b>${m.pdgId}</b> - ${m.title}</span><button class="btn-action" style="background:var(--accent); color:white" onclick="openRetex(${m.id})">ANALYSER</button></div>`;
+            else if(m.status === 'finalized') arch.innerHTML += `<div class="retex-card" style="border-left:8px solid var(--success)"><span><b>${m.pdgId}</b> - ${m.title}</span><div><button class="btn-action" onclick="generatePDF(${m.id})">PDF</button> <button class="btn-action" onclick="deleteMission(${m.id})" style="color:red">🗑️</button></div></div>`;
+        });
+    }
+    function openRetex(id) { const m = db_missions.find(x=>x.id==id); document.getElementById('retexId').value = id; document.getElementById('retexTitle').innerText = "Analyse : " + m.pdgId; document.getElementById('retexFormZone').style.display = 'block'; window.scrollTo(0,0); }
+    function saveRetex() { const id = parseInt(document.getElementById('retexId').value); const idx = db_missions.findIndex(x=>x.id==id); db_missions[idx].retex = { pos: document.getElementById('retPos').value, imp: document.getElementById('retImp').value, cor: document.getElementById('retCor').value }; db_missions[idx].status = 'finalized'; dbRef.set({ data: db_missions, counter: counter_pdg }).then(() => { closeRetex(); }); }
+    function closeRetex() { document.getElementById('retexFormZone').style.display = 'none'; document.getElementById('retPos').value = ''; document.getElementById('retImp').value = ''; document.getElementById('retCor').value = ''; }
+    async function generatePDF(id) { const m = db_missions.find(x=>x.id==id); document.getElementById('pdfH1').innerText = "RAPPORT MISSION : " + m.pdgId; document.getElementById('pdfMeta').innerText = "Généré le " + new Date().toLocaleString(); document.getElementById('pdfDetails').innerHTML = `<b>Titre:</b> ${m.title}<br><b>Lieu:</b> ${m.loc}<br><b>Resp:</b> ${m.resp}<br><b>Durée:</b> ${m.start} à ${m.end}`; document.getElementById('pdfPos').innerText = m.retex.pos || "-"; document.getElementById('pdfImp').innerText = m.retex.imp || "-"; document.getElementById('pdfCor').innerText = m.retex.cor || "-"; const el = document.getElementById('pdfTemplate'); el.style.display = 'block'; await html2pdf().set({ margin: 10, filename: `Rapport_${m.pdgId}.pdf`, jsPDF: { format: 'a4' } }).from(el).save(); el.style.display = 'none'; }
+    function deleteMission(id) { if(confirm("Supprimer ?")) { db_missions = db_missions.filter(x=>x.id !== id); dbRef.set({data:db_missions, counter:counter_pdg}); } }
 </script>
 </body>
 </html>
