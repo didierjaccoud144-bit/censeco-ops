@@ -256,7 +256,18 @@
 
     function toggleNote(id) { const el = document.getElementById(id); if (el) el.style.display = (el.style.display === 'block') ? 'none' : 'block'; }
     function toggleDay(d) { if(collapsedDays.includes(d)) collapsedDays = collapsedDays.filter(x => x !== d); else collapsedDays.push(d); renderAll(); }
-    function shareWA(id, t, l) { window.open(`https://wa.me/?text=${encodeURIComponent('*'+id+'* - '+t+'\n📍 '+l)}`); }
+    function shareWA(id, t, l) {
+    // On définit des valeurs par défaut si une donnée manque
+    const cleanId = id || "Mission";
+    const cleanTitle = t || "Sans titre";
+    const cleanLoc = l || "-";
+    
+    // On prépare le message proprement
+    const message = `*${cleanId}*\nTexte : ${cleanTitle}\nLieu : ${cleanLoc}`;
+    
+    // On ouvre WhatsApp avec le message encodé
+    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+}
     function archiveMission(id) { if(confirm("Clôturer ?")) { const idx = db_missions.findIndex(x=>x.id==id); db_missions[idx].status='archived'; dbRef.set({data:db_missions, counter:counter_pdg}); } }
 
     function editMission(id) { 
